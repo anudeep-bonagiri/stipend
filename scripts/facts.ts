@@ -22,8 +22,39 @@ async function countSigs(pk: PublicKey) {
   return { total, failed };
 }
 
+/** Did any task wallet ever hold a lamport? Scan every transaction of every task wallet and look at its balances. Gentle on the public RPC. */
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
+  for (let i = 0; ; i++) {
+    try { return await fn(); } catch (e) { if (i >= 8 || !/429|Too many requests/i.test(String(e))) throw e; await sleep(5000 * (i + 1)); }
+  }
+}
+async function everHeldSol(wallets: string[]) {
+  let ever = 0, txs = 0;
+  for (const w of wallets) {
+    const pk = new PublicKey(w);
+    const sigs = await withRetry(() => connection.getSignaturesForAddress(pk, { limit: 200 }));
+    await sleep(300);
+    let held = false;
+    for (let i = 0; i < sigs.length && !held; i += 4) {
+      const batch = sigs.slice(i, i + 4).map((x) => x.signature);
+      const parsed = await withRetry(() => connection.getParsedTransactions(batch, { maxSupportedTransactionVersion: 0 }));
+      txs += batch.length;
+      for (const tx of parsed) {
+        if (!tx?.meta) continue;
+        const k = tx.transaction.message.accountKeys.findIndex((a) => a.pubkey.equals(pk));
+        if (k >= 0 && ((tx.meta.postBalances[k] ?? 0) > 0 || (tx.meta.preBalances[k] ?? 0) > 0)) { held = true; break; }
+      }
+      await sleep(1500);
+    }
+    if (held) ever++;
+  }
+  return { ever, txs };
+}
+
 async function main() {
   const s = await computeStats();
+  const scanned = await everHeldSol(tasks.list().map((t) => t.wallet_pubkey));
   const sp = sponsor().publicKey, sv = servicesWallet().publicKey;
   const [spSigs, svSigs] = await Promise.all([countSigs(sp), countSigs(sv)]);
   const all = tasks.list();
@@ -37,7 +68,7 @@ async function main() {
     `| Transactions touching the sponsor wallet on devnet, airdrops included | ${spSigs.total} (${spSigs.failed} failed) | [sponsor wallet](${explorerAddress(sp.toBase58())}) |`,
     `| Transactions that paid the services wallet | ${svSigs.total} (${svSigs.failed} failed) | [services wallet](${explorerAddress(sv.toBase58())}) |`,
     `| Agent payments confirmed | ${s.payments_confirmed} (${s.payments_failed} failed), ${s.usdc_paid} USDC in total | ${lastPay?.sig ? `[one of them](${explorerTx(lastPay.sig)})` : ""} |`,
-    `| Task wallets that ever held a lamport (so could ever have paid a fee) | ${s.task_wallets_that_ever_held_sol} of ${s.task_wallets_checked}, read from devnet | any task wallet |`,
+    `| Task wallets that ever held a lamport (so could ever have paid a fee) | ${scanned.ever} of ${s.task_wallets_checked}, from scanning all ${scanned.txs} of their transactions on devnet | any task wallet |`,
     `| Tasks that spent more than the owner signed into them | ${s.overspend_succeeded} of ${s.tasks}, computed from the ledger task by task | task pages |`,
     `| Payments refused for an unlisted payee | ${s.payments_refused_unlisted_payee} | task pages, red lines |`,
     `| Attack drills run / model took the bait, all prompts | ${s.drills_run} / ${s.drills_model_took_bait} | drill task pages |`,

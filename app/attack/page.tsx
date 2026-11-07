@@ -18,7 +18,7 @@ function AttackInner() {
   const [data, setData] = useState<Data | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  useEffect(() => { setOwner(loadOwner()?.publicKey.toBase58() ?? null); const t = params.get("task"); if (t) setTaskId(t); }, [params]);
+  useEffect(() => { let alive = true; const t = params.get("task"); Promise.resolve().then(() => { if (!alive) return; setOwner(loadOwner()?.publicKey.toBase58() ?? null); if (t) setTaskId(t); }); return () => { alive = false; }; }, [params]);
   useEffect(() => {
     if (!taskId) return;
     let alive = true;

@@ -34,7 +34,7 @@ export default function Home() {
     const [s, t, f] = await Promise.all([fetch("/api/stats").then((r) => r.json()), fetch("/api/tasks").then((r) => r.json()), fetch("/api/feed").then((r) => r.json())]);
     setStats(s); setTasks(t.tasks); setFeed(f);
   }
-  useEffect(() => { setHello(greeting()); setOwner(loadOwner()?.publicKey.toBase58() ?? null); refresh(); const i = setInterval(refresh, 2500); return () => clearInterval(i); }, []);
+  useEffect(() => { let alive = true; Promise.resolve().then(() => { if (!alive) return; setHello(greeting()); setOwner(loadOwner()?.publicKey.toBase58() ?? null); refresh(); }); const i = setInterval(refresh, 2500); return () => { alive = false; clearInterval(i); }; }, []);
 
   async function start() {
     if (!owner) return;
@@ -105,7 +105,7 @@ export default function Home() {
           {stats && <>
             {tile("payments confirmed", stats.payments_confirmed, true)}
             {tile("payments failed", stats.payments_failed)}
-            {tile("task wallets that ever held SOL", stats.task_wallets_that_ever_held_sol != null ? `${stats.task_wallets_that_ever_held_sol} of ${stats.task_wallets_checked}` : "checking")}
+            {tile("task wallets holding any SOL right now", stats.task_wallets_that_ever_held_sol != null ? `${stats.task_wallets_that_ever_held_sol} of ${stats.task_wallets_checked}` : "checking")}
             {tile("overspends that succeeded", stats.overspend_succeeded)}
             {tile("receipts anchored", stats.receipts_anchored, true)}
             {tile("USDC swept back", stats.usdc_swept_back)}

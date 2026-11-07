@@ -54,7 +54,7 @@ function TaskPageInner() {
         <div className="muted mt-2 flex flex-wrap gap-x-6 gap-y-1 text-sm">
           <span>task wallet <a className="mono" href={addrUrl(task.wallet_pubkey)} target="_blank" rel="noreferrer">{short(task.wallet_pubkey)}</a></span>
           <span>owner <a className="mono" href={addrUrl(task.owner_pubkey)} target="_blank" rel="noreferrer">{short(task.owner_pubkey)}</a></span>
-          <span>started {when(events[0]?.ts ?? Date.now())}</span>
+          <span>started {events[0] ? when(events[0].ts) : "–"}</span>
         </div>
       </section>
 

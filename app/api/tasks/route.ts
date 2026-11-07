@@ -5,7 +5,7 @@ import { tasks } from "@/lib/db";
 
 export async function GET() {
   await connection(); // always live, never prerendered
-  return Response.json({ tasks: tasks.list().map(({ wallet_secret: _s, ...t }) => t) });
+  return Response.json({ tasks: tasks.list().map((t) => Object.fromEntries(Object.entries(t).filter(([k]) => k !== "wallet_secret"))) });
 }
 
 export async function POST(req: Request) {
@@ -18,6 +18,6 @@ export async function POST(req: Request) {
   if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(owner)) return Response.json({ error: "ownerPubkey required" }, { status: 400 });
   const planted = typeof body.planted === "string" && body.planted.trim() ? body.planted.trim().slice(0, 1500) : null;
   const { task, ask } = createTask(goal, toMicro(budget), owner, !!body.injection || !!planted, planted);
-  const { wallet_secret: _s, ...safe } = task;
+  const safe = Object.fromEntries(Object.entries(task).filter(([k]) => k !== "wallet_secret"));
   return Response.json({ task: safe, ask });
 }

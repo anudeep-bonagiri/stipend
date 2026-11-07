@@ -52,7 +52,7 @@ export async function computeStats() {
     payments_confirmed: confirmed.length,
     payments_failed: pays.filter((p) => p.status === "failed").length,
     usdc_paid: fromMicro(confirmed.reduce((s, p) => s + p.micro, 0)),
-    // A wallet that has never held a lamport cannot have paid a fee. Checked on chain for every task wallet.
+    // A wallet with no lamports cannot pay a fee. This is the balance right now; scripts/facts.ts scans history for "ever".
     task_wallets_checked: chain.wallets,
     task_wallets_that_ever_held_sol: chain.ok ? chain.walletsWithSol : null,
     fees_paid_by_task_wallets_sol: chain.ok ? (chain.walletsWithSol === 0 ? 0 : null) : null,

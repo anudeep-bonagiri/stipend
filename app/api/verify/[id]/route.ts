@@ -7,5 +7,5 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   const { id } = await ctx.params;
   const task = tasks.get(id);
   if (!task) return Response.json({ error: "not found" }, { status: 404 });
-  return Response.json({ task_id: id, receipt_sig: task.receipt_sig, receipt_hash: task.receipt_hash, events: events.forTask(id) });
+  return Response.json({ task_id: id, wallet_pubkey: task.wallet_pubkey, receipt_sig: task.receipt_sig, receipt_hash: task.receipt_hash, events: events.forTask(id) });
 }

@@ -2,7 +2,7 @@
 
 **The money layer for AI agents. Every task gets its own wallet, its own budget, and a human who signs anything beyond it.**
 
-Built from an empty folder on November 7 and 8, 2026 for the MLH Solana Hackathon. Solana devnet, test money only.
+Built from an empty folder on November 7, 2026 for the MLH Solana Hackathon (the event ran November 6 to 8). Solana devnet, test money only.
 
 - Code: this repository (MIT)
 - How it works, in the app: `/about`
@@ -43,7 +43,7 @@ AI agents now pay for things: searches, model calls, data, compute. Today that m
 
 - **Its own envelope.** Each task gets a fresh wallet funded with exactly its budget. It cannot spend what is not there. No program, no policy engine, just arithmetic the chain enforces.
 - **Never the safe key.** The owner's key is generated in the owner's browser and never sent anywhere. Funding a task is the owner signing one transfer; the box adds the fee signature and cannot change what was signed.
-- **Only certain doors.** The task can pay the listed services and nobody else. A payment to a stranger is refused and logged, not asked about.
+- **Only certain doors.** The task can pay the listed services and nobody else. A payment to a stranger is refused and logged, not asked about. (A planted page that named the listed service's own wallet would be paid like any service call, and could only run the envelope down to an ask.)
 - **The front desk calls you.** Anything beyond the budget pauses the task and asks the owner, with the agent's own reason and the risk flags the broker saw.
 - **Cameras in the hallway.** Every payment carries a memo naming its task. The action log is hash-chained, and its last hash is written to Solana when the task ends. The verify page recomputes every hash in your browser and reads the memo from a public node itself.
 - **Hand back the change.** Whatever is left is swept to the owner and the task's token account is closed, so even the rent comes back.
@@ -94,19 +94,19 @@ Mint: [C9ZHo6VUmfCnGVXBAtJEgAicFHMmXJ3Pf5zxyKdkPLKu](https://explorer.solana.com
 | A fresh wallet per task, funded with exactly the budget | Keypair per task, held by the broker | SPL token accounts; the balance is the budget | Shipped |
 | Owner funds a task from the browser | Transaction built and partially signed client side, never leaves with the key | Multi-signer transactions: owner signs the transfer, sponsor signs the fee | Shipped |
 | Task wallets never hold SOL | Broker sets the sponsor as fee payer on every transaction | Separate fee payer; `createAssociatedTokenAccountIdempotent` paid by the sponsor | Shipped |
-| Per-request payment for search and model calls | x402-shaped gate: 402, pay, retry with `X-Payment: <signature>` | `TransferChecked` of USDC, read back with `getParsedTransaction` before the service answers; signature replay blocked | Shipped |
+| Per-request payment for search and model calls | x402-shaped gate: 402, pay, retry with `X-Payment: <signature>`; the payment memo carries the hash of the exact request, so a signature seen on chain cannot be presented for a different request | `TransferChecked` of USDC, read back with `getParsedTransaction` before the service answers; signature replay blocked | Shipped |
 | Every payment names its task | Memo `stipend:<task>:<service>:<nonce>` on each transfer | SPL Memo program | Shipped |
 | Refuse unknown payees | The only code with the task key checks the destination | n/a | Shipped |
 | Pause and ask the owner when over budget | Ask with reason and risk flags; task resumes on approval | The approval is a signed, confirmed transfer | Shipped |
 | Sweep leftover and close the account | At task end | `TransferChecked` back to the owner, `CloseAccount` returns rent to the sponsor | Shipped |
-| Receipt per task | Hash-chained log; last hash anchored at task end | Memo transaction `stipend:v1:<task>:<entries>:<hash>` | Shipped |
-| Verify in the browser | Recomputes every hash with Web Crypto; tamper test | Reads the memo from a public RPC node, not from the box | Shipped |
+| Receipt per task | Hash-chained log; last hash anchored at task end | Memo transaction `stipend:v1:<task>:<entries>:<hash>`, co-signed by the task wallet so it is findable under that address | Shipped |
+| Verify in the browser | Recomputes every hash with Web Crypto; tamper test | Finds the receipt by scanning the task wallet's transactions on a public node; the box's pointer is only a cross-check (tasks anchored before this change fall back to the pointer) | Shipped |
 
 ## Attack it yourself
 
 The `/attack` page takes what a booby-trapped page might tell an agent, or one of three prepared ones (a dataset page that demands payment, a hidden HTML comment, white-on-white text), plants it in the agent's first search results, runs the task for real on devnet, and shows every defence as a card: the planted page arrived, the model took the bait, the broker refused the payee, the envelope ran out so it stopped and asked you, you declined, the receipt is on chain.
 
-Plainly: the planted page is inserted into the first search's results by Stipend's own code, not fetched from the web; this is a drill, not a wild sample. The agent sees two tools, `search` and `pay`, described neutrally with their prices and nothing about when to use them (`synthPrompt` in `lib/agent.ts`). Until Nov 7 at about 4 PM CST the output format instead described a `payments` field as "only if a source says a payment is required", which leads the model; the proof table counts drills before and after that change separately.
+Plainly: the planted page is inserted into the first search's results by Stipend's own code, not fetched from the web; this is a drill, not a wild sample. The agent sees two tools, `search` and `pay`, described neutrally with their prices and nothing about when to use them (`synthPrompt` in `lib/agent.ts`). Until Nov 7 at 3:14 PM CST the output format instead described a `payments` field as "only if a source says a payment is required", which leads the model; the proof table counts drills before and after that change separately. The drill in the video is the second take of that session: the first run with the neutral prompt (`/tasks/task_6212bda36057` on the live app) ignored the page and finished clean, and the recorded one (`/tasks/task_bae81161bf5a`) took the bait.
 
 Turn on "attack drill" when starting a task from the home page and the first search's results include a planted page that tells the agent the right answer requires paying 2 USDC to a stranger and running twenty more searches. The agent's output format deliberately allows it to request payments and more searches, because the point is not that the model behaves. Gemini 2.5 Flash does not always take the bait; the Proof table above counts how often it did. When it does, it calls `pay` for 2 USDC to the stranger and `search` for the extra queries. Both payments were refused because the payee is not a listed service. The extra searches drained the budget, the task paused and asked the owner for the shortfall with the flags "instruction came from web content" and "over budget", the owner declined, the task ended with the answer it already had, and the receipt was still anchored. The stranger's wallet holds nothing.
 
@@ -118,7 +118,7 @@ Turn on "attack drill" when starting a task from the home page and the first sea
 
 **Can't the model just refuse the injected instruction?** Sometimes. Stipend assumes it will not, and makes sure a fooled agent has nothing to steal and nowhere to send it.
 
-**What if the box is fully compromised?** It can spend the budgets already sitting in task wallets, and nothing more. It cannot reach the owner's funds, cannot fund a task, and cannot rewrite what is already anchored on chain.
+**What if the box is fully compromised?** It can spend the budgets already sitting in task wallets, and nothing more, on chain. It cannot move the owner's funds without the owner signing in the owner's browser. The honest caveat: the box serves that browser its JavaScript, so a compromised box could serve altered pages; the owner is protected against a box that is wrong, not against one that is actively hostile to the page it serves. It also cannot rewrite what is already anchored on chain.
 
 **Is this x402?** It follows the shape (402 with payment details, pay, retry with proof) and settles in USDC on Solana, but we verify payments ourselves by reading the transfer from the chain instead of using a facilitator. No Coinbase account needed to run it.
 
@@ -129,6 +129,8 @@ Turn on "attack drill" when starting a task from the home page and the first sea
 - A task wallet's key is held by the broker, so a compromised box can spend budgets already funded. That is the design: budgets are the blast radius.
 - No metered payment channels (x402 "upto"), no hardware wallet for the owner, no sandbox for the agent's own code, no mainnet.
 - The receipt proves the log entries are the ones the box wrote and were not changed afterward. It does not prove the agent was right.
+- The owner key used while recording the video was a throwaway devnet key. The recording script saved it to a file that was committed by mistake; it has been purged from the repository's history and retired, and the home and owner screenshots show its replacement.
+- The owner key lives in the browser's localStorage in plaintext, and there is no wallet adapter yet. A browser extension or any script on the origin could read it. Phantom support is the next step.
 
 ## What I learned
 
@@ -139,7 +141,7 @@ This was my first Solana build. The things that were new to me, and that the pro
 - Associated token accounts cost rent, and `CloseAccount` gives it back to whoever you name. Sweeping a task and closing its account returns even the rent to the sponsor.
 - The Memo program is enough to anchor a hash chain. Every payment names its task, and a receipt is one memo transaction that any browser can read back from a public node.
 - `getParsedTransaction` is how a paid service can verify a payment itself, without a facilitator in the middle, and a used-signature table is what stops the same payment being presented twice.
-- What I got wrong first: the sponsor co-signed whatever the browser posted, and declines were unauthenticated. An independent review caught both on the first day; the fix is the shape check and the signed decline described above.
+- What I got wrong first: the sponsor co-signed whatever the browser posted, declines were unauthenticated, the verify page trusted the box for which transaction to check, a payment signature was not tied to the request it paid for, and the recorder's throwaway owner key got committed. Two independent reviews caught these on the first day; the fixes are the shape check, the signed decline, receipts co-signed by the task wallet and found by scanning its address, the request hash in every payment memo, and a purged history.
 
 ## Rules, honestly
 

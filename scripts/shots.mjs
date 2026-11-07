@@ -2,7 +2,17 @@
 import { chromium } from "playwright";
 import fs from "node:fs";
 const BASE = "http://localhost:3000";
-const owner = fs.existsSync("docs/video/rec/owner.json") ? fs.readFileSync("docs/video/rec/owner.json", "utf8") : null;
+import { Keypair } from "@solana/web3.js";
+let owner = fs.existsSync("docs/video/rec/owner.json") ? fs.readFileSync("docs/video/rec/owner.json", "utf8") : null;
+if (!owner) {
+  // A fresh throwaway owner for the screenshots; the recorder reuses it. Never committed.
+  const kp = Keypair.generate();
+  owner = JSON.stringify(Array.from(kp.secretKey));
+  fs.mkdirSync("docs/video/rec", { recursive: true });
+  fs.writeFileSync("docs/video/rec/owner.json", owner);
+  const r = await fetch(`${BASE}/api/faucet`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ pubkey: kp.publicKey.toBase58() }) });
+  console.log("new owner", kp.publicKey.toBase58(), "faucet", r.status);
+}
 const tasks = (await (await fetch(`${BASE}/api/tasks`)).json()).tasks;
 const finished = tasks.find((t) => t.status === "finished" && !t.injection);
 const drill = tasks.find((t) => t.injection && t.status === "declined") ?? tasks.find((t) => t.injection);

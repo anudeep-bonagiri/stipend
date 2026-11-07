@@ -23,7 +23,7 @@ export default function OwnerPage() {
     if (typeof b.usdc === "number") setBalance(b.usdc);
     setAsks(a.asks ?? []);
   }, [pub]);
-  useEffect(() => { setOwner(loadOwner()); }, []);
+  useEffect(() => { let alive = true; Promise.resolve().then(() => { if (alive) setOwner(loadOwner()); }); return () => { alive = false; }; }, []);
   useEffect(() => { refresh(); const i = setInterval(refresh, 2500); return () => clearInterval(i); }, [refresh]);
 
   async function faucet() {
@@ -33,7 +33,7 @@ export default function OwnerPage() {
     setLog((l) => [{ text: r.ok ? "Minted 5 demo USDC" : `Faucet failed: ${d.error}`, sig: d.sig }, ...l]); setBusy(null); refresh();
   }
   async function approve(a: Ask) {
-    if (!owner) return; setBusy(a.id);
+    if (!owner) return; setBusy(`${a.id}:approve`);
     try {
       const t0 = performance.now();
       const tx = await signFunding(owner, a.wallet_pubkey, BigInt(a.micro), a.id);
@@ -44,7 +44,7 @@ export default function OwnerPage() {
     setBusy(null); refresh();
   }
   async function decline(a: Ask) {
-    if (!owner) return; setBusy(a.id);
+    if (!owner) return; setBusy(`${a.id}:decline`);
     const r = await fetch(`/api/asks/${a.id}/decline`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ signature: signDecline(owner, a.id) }) }); const d = await r.json();
     setLog((l) => [{ text: r.ok ? `Declined ${usdc(a.micro)} USDC for "${a.goal}". The task ends and its leftover sweeps back.` : `Decline failed: ${d.error}` }, ...l]);
     setBusy(null); refresh();
@@ -95,8 +95,8 @@ export default function OwnerPage() {
               <div className="muted mt-1 text-xs">into task wallet <a className="mono" href={addrUrl(a.wallet_pubkey)} target="_blank" rel="noreferrer">{short(a.wallet_pubkey)}</a></div>
               {a.risk.length > 0 && <div className="mt-2 flex flex-wrap gap-1">{a.risk.map((r) => <span key={r} className="chip chip-warn">{r}</span>)}</div>}
               <div className="mt-3 flex gap-2">
-                <button className="btn-phone" disabled={!owner || !!busy} onClick={() => decline(a)}>Decline</button>
-                <button className="btn-phone go" disabled={!owner || !!busy || (balance ?? 0) < a.micro / 1e6} onClick={() => approve(a)}>{busy === a.id ? "Signing…" : "Approve and sign"}</button>
+                <button className="btn-phone" disabled={!owner || !!busy} onClick={() => decline(a)}>{busy === `${a.id}:decline` ? "Signing…" : "Decline"}</button>
+                <button className="btn-phone go" disabled={!owner || !!busy || (balance ?? 0) < a.micro / 1e6} onClick={() => approve(a)}>{busy === `${a.id}:approve` ? "Signing…" : "Approve and sign"}</button>
               </div>
             </div>
           ))}

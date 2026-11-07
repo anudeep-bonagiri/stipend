@@ -130,14 +130,15 @@ function servicesDestination() {
  * the wallet cannot cover it and the owner is asked for the shortfall.
  */
 export async function pay(taskId: string, opts: {
-  service: ServiceName | "external"; destination?: string; micro?: bigint; reason: string; risk?: string[];
+  service: ServiceName | "external"; destination?: string; micro?: bigint; reason: string; risk?: string[]; bodyHash?: string;
 }): Promise<string> {
   const task = tasks.get(taskId)!;
   const wallet = walletOf(task);
   const svc = opts.service === "external" ? null : SERVICES[opts.service];
   const destination = opts.destination ?? servicesDestination();
   const micro = opts.micro ?? svc?.priceMicro ?? 0n;
-  const memo = `stipend:${taskId}:${opts.service}:${newId("p").slice(2)}`;
+  // The memo names the task and, for a service call, the hash of the exact request it pays for.
+  const memo = `stipend:${taskId}:${opts.service}:${newId("p").slice(2)}${opts.bodyHash ? `:h=${opts.bodyHash}` : ""}`;
   if (destination !== servicesDestination()) {
     events.append(taskId, "pay.refused", { destination, usdc: fromMicro(micro), reason: opts.reason, why: "payee is not a listed service", risk: opts.risk ?? [] });
     throw new Error("refused: payee is not a listed service");
@@ -191,7 +192,7 @@ export async function finishTask(taskId: string, opts: { status: "finished" | "d
   const last = log[log.length - 1];
   const memo = `stipend:v1:${taskId}:${log.length}:${last.hash}`;
   try {
-    const sig = await anchorMemo(memo);
+    const sig = await anchorMemo(memo, [wallet]); // the task wallet co-signs, so the receipt is findable under its address
     tasks.update(taskId, { receipt_sig: sig, receipt_hash: last.hash });
     events.append(taskId, "task.receipt", { sig, covers: log.length, hash: last.hash });
   } catch (e) {

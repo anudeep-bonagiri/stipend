@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { ata, readPayment, fromMicro } from "./chain";
 import { USDC_MINT, CLUSTER } from "./env";
 import { usedSigs } from "./db";
@@ -9,7 +10,9 @@ import { SERVICES, ServiceName, servicesWallet } from "./services";
  * the transaction from the chain and checks the destination, the amount, the memo
  * and that the signature has not been used before. No facilitator in the middle.
  */
-export async function requirePayment(req: Request, service: ServiceName) {
+export const bodyHash = (text: string) => crypto.createHash("sha256").update(text).digest("hex").slice(0, 16);
+
+export async function requirePayment(req: Request, service: ServiceName): Promise<{ response: Response } | { payment: Awaited<ReturnType<typeof readPayment>>; body: string }> {
   const { priceMicro } = SERVICES[service];
   const payTo = servicesWallet().publicKey;
   const payToAta = ata(payTo).toBase58();
@@ -41,6 +44,10 @@ export async function requirePayment(req: Request, service: ServiceName) {
   if (p.destination !== payToAta) return { response: deny("payment went to a different wallet") };
   if ((p.micro ?? 0n) < priceMicro) return { response: deny(`underpaid: ${fromMicro(p.micro ?? 0n)} < ${fromMicro(priceMicro)} USDC`) };
   if (!p.memo?.startsWith("stipend:")) return { response: deny("payment memo does not name a task") };
+  // The memo must carry the hash of this exact request, so a payment seen on chain cannot be presented by someone else for a different request.
+  const body = await req.text();
+  const want = /:h=([0-9a-f]{16})/.exec(p.memo)?.[1];
+  if (!want || want !== bodyHash(body)) return { response: deny("payment is not bound to this request") };
   if (!usedSigs.tryUse(sig, service)) return { response: deny("this payment was already used") };
-  return { payment: p };
+  return { payment: p, body };
 }

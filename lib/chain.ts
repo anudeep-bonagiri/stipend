@@ -125,12 +125,16 @@ export async function mintDemoUsdc(to: PublicKey, micro: bigint) {
   return mintTo(connection, payer, mint, dst, auth, micro);
 }
 
-/** Write a short text to the chain from the sponsor. Used for receipts. */
-export async function anchorMemo(text: string): Promise<string> {
+/**
+ * Write a short text to the chain. The sponsor pays the fee; extra signers (the
+ * task wallet, for receipts) co-sign so the memo shows up under their address and
+ * anyone can find it by scanning that address, without asking the box.
+ */
+export async function anchorMemo(text: string, extraSigners: Keypair[] = []): Promise<string> {
   const payer = sponsor();
-  const tx = new Transaction().add(createMemoInstruction(text, [payer.publicKey]));
+  const tx = new Transaction().add(createMemoInstruction(text, [payer.publicKey, ...extraSigners.map((k) => k.publicKey)]));
   tx.feePayer = payer.publicKey;
-  return sendAndConfirmTransaction(connection, tx, [payer], { commitment: "confirmed" });
+  return sendAndConfirmTransaction(connection, tx, [payer, ...extraSigners], { commitment: "confirmed" });
 }
 
 export type ParsedPayment = {

@@ -117,7 +117,6 @@ const segments = {
     await page.waitForSelector("text=Approved 0.06 USDC", { timeout: 60000 }); mark("approved"); await sleep(2500);
     const href = await page.locator("a:has-text('explorer')").first().getAttribute("href");
     fs.writeFileSync(path.join(OUT, "last-task.json"), JSON.stringify({ explorer: href }));
-    const taskLink = await page.locator("section:has-text('What you did') a").first();
     await sleep(500);
   },
 
