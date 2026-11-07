@@ -63,26 +63,26 @@ AI agents now pay for things: searches, model calls, data, compute. Today that m
 | Unknown payees | Policy says no, if policy runs | Refused by the only code that holds the task key |
 
 <!-- facts:start -->
-## Proof (generated 2026-11-07 21:19 UTC by scripts/facts.ts)
+## Proof (generated 2026-11-07 22:42 UTC by scripts/facts.ts)
 
 | Number | Value | Where to check |
 |---|---|---|
-| Transactions touching the sponsor wallet on devnet, airdrops included | 196 (0 failed) | [sponsor wallet](https://explorer.solana.com/address/DX7jAZax87KtAiSEv85ArXViU8heEjkf9CRUMiMZU6zC?cluster=devnet) |
-| Transactions that paid the services wallet | 130 (0 failed) | [services wallet](https://explorer.solana.com/address/DL7YweYxDerw3BgpmBG9PpePZC8VfwncpC2fo7CL4uXf?cluster=devnet) |
-| Agent payments confirmed | 130 (0 failed), 0.85 USDC in total | [one of them](https://explorer.solana.com/tx/5x9kR7Zeff7Nmv9VmgaB5CbHsZbJtwKQxg5TicLTykBk78bqn93VWdih6Ya5E6ubmQu5n4QiwMNXGc4q5oKSAje7?cluster=devnet) |
-| Task wallets that ever held a lamport (so could ever have paid a fee) | 0 of 19, read from devnet | any task wallet |
-| Tasks that spent more than the owner signed into them | 0 of 19, computed from the ledger task by task | task pages |
+| Transactions touching the sponsor wallet on devnet, airdrops included | 205 (0 failed) | [sponsor wallet](https://explorer.solana.com/address/DX7jAZax87KtAiSEv85ArXViU8heEjkf9CRUMiMZU6zC?cluster=devnet) |
+| Transactions that paid the services wallet | 134 (0 failed) | [services wallet](https://explorer.solana.com/address/DL7YweYxDerw3BgpmBG9PpePZC8VfwncpC2fo7CL4uXf?cluster=devnet) |
+| Agent payments confirmed | 134 (0 failed), 0.88 USDC in total | [one of them](https://explorer.solana.com/tx/3JErsJvJ5AwF148aNmgfSadEwXPD4C9ZQ7tFXvZmKvr8eTCSVP4sGFxBeoBzoVLjdzCdUk1eEbDhm3K4zd4UBBm1?cluster=devnet) |
+| Task wallets that ever held a lamport (so could ever have paid a fee) | 0 of 20, from scanning all 175 of their transactions on devnet | any task wallet |
+| Tasks that spent more than the owner signed into them | 0 of 20, computed from the ledger task by task | task pages |
 | Payments refused for an unlisted payee | 10 | task pages, red lines |
 | Attack drills run / model took the bait, all prompts | 13 / 9 | drill task pages |
-| Attack drills with the neutral tool prompt / took the bait | 3 / 1 | drill task pages after Nov 7, 4 PM CST |
+| Attack drills with the neutral tool prompt / took the bait | 3 / 1 | drill task pages after Nov 7, 3:14 PM CST |
 | USDC held by the stranger wallet | 0, read from devnet | [the stranger](https://explorer.solana.com/address/7gvj3mJ2m1EBk6Lu4R2nZf9m7GzN2bYdZ2DJg2j3vZK9?cluster=devnet) |
-| Owner asks: approved / declined | 19 / 8 | task pages |
-| USDC swept back to owners | 0.29 | task pages, sweep transactions |
-| Receipts anchored on chain | 19 of 19 tasks | [bae811](https://explorer.solana.com/tx/dVWJPyNA6op9pu3Nni3HFJdADVkM1aJLo1WWtJPcDMvZL4k4JK4MRL3bxoGMV62sc9EC2nhDZSGRKQLZJYkZCF1?cluster=devnet), [6212bd](https://explorer.solana.com/tx/ARHDVGicz7NsormRJZKMZpcBD18idViD2ocEeMMah29Psu6aFPkixyyMbcD5iLhW35PL8Ze751ugkADiX3pRRMo?cluster=devnet), [cd7013](https://explorer.solana.com/tx/4WvHSww3k7kyquZ9EYazZm5U9ymWVX1rEE2Bep2qPcX9FtCRs7zSATv55wUisodyobTPgUgyjAz5b54j2wNWxD91?cluster=devnet) |
-| Hash-chained log entries | 400 | /verify/<task> recomputes them in your browser |
+| Owner asks: approved / declined | 20 / 8 | task pages |
+| USDC swept back to owners | 0.32 | task pages, sweep transactions |
+| Receipts anchored on chain | 20 of 20 tasks | [d18b84](https://explorer.solana.com/tx/ryarB1Uh4zyFfxSqmuprYZBCCVdS15YMe6n2hFbRxBPFv328N7RCpYHsLDEvG2MUn6pjyD8yvb7HjjaYVjVsw5v?cluster=devnet), [bae811](https://explorer.solana.com/tx/dVWJPyNA6op9pu3Nni3HFJdADVkM1aJLo1WWtJPcDMvZL4k4JK4MRL3bxoGMV62sc9EC2nhDZSGRKQLZJYkZCF1?cluster=devnet), [6212bd](https://explorer.solana.com/tx/ARHDVGicz7NsormRJZKMZpcBD18idViD2ocEeMMah29Psu6aFPkixyyMbcD5iLhW35PL8Ze751ugkADiX3pRRMo?cluster=devnet) |
+| Hash-chained log entries | 414 | /verify/<task> recomputes them in your browser |
 | Payment confirmed, median | 817 ms | task pages, "confirmed in" column |
 | Funding transaction received by the box to confirmed, median | 860 ms | owner.approved log lines |
-| Sponsor SOL left | 9.991 | [sponsor wallet](https://explorer.solana.com/address/DX7jAZax87KtAiSEv85ArXViU8heEjkf9CRUMiMZU6zC?cluster=devnet) |
+| Sponsor SOL left | 9.990 | [sponsor wallet](https://explorer.solana.com/address/DX7jAZax87KtAiSEv85ArXViU8heEjkf9CRUMiMZU6zC?cluster=devnet) |
 
 Mint: [C9ZHo6VUmfCnGVXBAtJEgAicFHMmXJ3Pf5zxyKdkPLKu](https://explorer.solana.com/address/C9ZHo6VUmfCnGVXBAtJEgAicFHMmXJ3Pf5zxyKdkPLKu?cluster=devnet) (our own devnet test mint, 6 decimals; test money).
 <!-- facts:end -->

@@ -72,7 +72,7 @@ async function main() {
     `| Tasks that spent more than the owner signed into them | ${s.overspend_succeeded} of ${s.tasks}, computed from the ledger task by task | task pages |`,
     `| Payments refused for an unlisted payee | ${s.payments_refused_unlisted_payee} | task pages, red lines |`,
     `| Attack drills run / model took the bait, all prompts | ${s.drills_run} / ${s.drills_model_took_bait} | drill task pages |`,
-    `| Attack drills with the neutral tool prompt / took the bait | ${s.drills_run_neutral_prompt} / ${s.drills_model_took_bait_neutral_prompt} | drill task pages after Nov 7, 4 PM CST |`,
+    `| Attack drills with the neutral tool prompt / took the bait | ${s.drills_run_neutral_prompt} / ${s.drills_model_took_bait_neutral_prompt} | drill task pages after Nov 7, 3:14 PM CST |`,
     `| USDC held by the stranger wallet | ${s.stranger_usdc_received}, read from devnet | [the stranger](${explorerAddress("7gvj3mJ2m1EBk6Lu4R2nZf9m7GzN2bYdZ2DJg2j3vZK9")}) |`,
     `| Owner asks: approved / declined | ${s.asks_approved} / ${s.asks_declined} | task pages |`,
     `| USDC swept back to owners | ${s.usdc_swept_back} | task pages, sweep transactions |`,
