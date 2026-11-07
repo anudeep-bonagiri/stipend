@@ -9,6 +9,16 @@ Built from an empty folder on November 7 and 8, 2026 for the MLH Solana Hackatho
 - Demo video: _link added at submission_
 - Live demo: _link added at submission_
 
+## Screens
+
+| Home | Owner's phone | Attack it yourself |
+|---|---|---|
+| ![Home: Needs you, Running, Spent today](docs/screenshots/home.png) | ![Owner approvals on a phone](docs/screenshots/owner.png) | ![Attack it yourself](docs/screenshots/attack.png) |
+
+| A drill, and what stopped it | A finished task | Verify in your browser |
+|---|---|---|
+| ![What stopped it](docs/screenshots/drill.png) | ![The envelope and the payments](docs/screenshots/task.png) | ![Verify](docs/screenshots/verify.png) |
+
 ## The problem
 
 When an AI agent can pay for things, the money it can spend is not tied to the work it is doing.
@@ -88,9 +98,11 @@ Mint: [C9ZHo6VUmfCnGVXBAtJEgAicFHMmXJ3Pf5zxyKdkPLKu](https://explorer.solana.com
 | Receipt per task | Hash-chained log; last hash anchored at task end | Memo transaction `stipend:v1:<task>:<entries>:<hash>` | Shipped |
 | Verify in the browser | Recomputes every hash with Web Crypto; tamper test | Reads the memo from a public RPC node, not from the box | Shipped |
 
-## The attack drill
+## Attack it yourself
 
-Turn on "attack drill" when starting a task and the first search's results include a planted page that tells the agent the right answer requires paying 2 USDC to a stranger and running twenty more searches. The agent's output format deliberately allows it to request payments and more searches, because the point is not that the model behaves. Gemini 2.5 Flash does not always take the bait; the Proof table above counts how often it did in our runs. When it does, it requests the 2 USDC payment and asks for the extra searches. Both payments were refused because the payee is not a listed service. The extra searches drained the budget, the task paused and asked the owner for the shortfall with the flags "instruction came from web content" and "over budget", the owner declined, the task ended with the answer it already had, and the receipt was still anchored. The stranger's wallet holds nothing.
+The `/attack` page takes what a booby-trapped page might tell an agent, or one of three prepared ones (a dataset page that demands payment, a hidden HTML comment, white-on-white text), plants it in the agent's first search results, runs the task for real on devnet, and shows every defence as a card: the planted page arrived, the model took the bait, the broker refused the payee, the envelope ran out so it stopped and asked you, you declined, the receipt is on chain.
+
+Turn on "attack drill" when starting a task from the home page and the first search's results include a planted page that tells the agent the right answer requires paying 2 USDC to a stranger and running twenty more searches. The agent's output format deliberately allows it to request payments and more searches, because the point is not that the model behaves. Gemini 2.5 Flash does not always take the bait; the Proof table above counts how often it did in our runs. When it does, it requests the 2 USDC payment and asks for the extra searches. Both payments were refused because the payee is not a listed service. The extra searches drained the budget, the task paused and asked the owner for the shortfall with the flags "instruction came from web content" and "over budget", the owner declined, the task ended with the answer it already had, and the receipt was still anchored. The stranger's wallet holds nothing.
 
 ## Questions judges ask
 
