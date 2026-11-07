@@ -47,3 +47,6 @@ data/
 docs/video/*.mp4
 docs/video/*.json
 docs/video/frames/
+docs/video/rec/
+docs/video/vo/
+docs/video/*.log
