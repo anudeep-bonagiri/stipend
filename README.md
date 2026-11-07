@@ -51,21 +51,21 @@ GurtOS won Best Use of Solana at Cal Hacks 13.0 two weeks ago with an operating 
 GurtOS does far more than money. This comparison is about the money layer only.
 
 <!-- facts:start -->
-## Proof (generated 2026-11-07 18:13 UTC by scripts/facts.ts)
+## Proof (generated 2026-11-07 18:14 UTC by scripts/facts.ts)
 
 | Number | Value | Where to check |
 |---|---|---|
-| Transactions the sponsor paid fees for, on devnet | 33 (0 failed) | [sponsor wallet](https://explorer.solana.com/address/DX7jAZax87KtAiSEv85ArXViU8heEjkf9CRUMiMZU6zC?cluster=devnet) |
-| Transactions that paid the services wallet | 17 (0 failed) | [services wallet](https://explorer.solana.com/address/DL7YweYxDerw3BgpmBG9PpePZC8VfwncpC2fo7CL4uXf?cluster=devnet) |
-| Agent payments confirmed | 17 (0 failed), 0.12 USDC in total | [one of them](https://explorer.solana.com/tx/2E4eNFUoV3AqbGnjsRExgF83LsUV6D5pSUHgUHj4viJCcoJLJFGhzUJhVZCogSpGcZPNh32N6qm2ogHJDcAwU9TB?cluster=devnet) |
+| Transactions the sponsor paid fees for, on devnet | 46 (0 failed) | [sponsor wallet](https://explorer.solana.com/address/DX7jAZax87KtAiSEv85ArXViU8heEjkf9CRUMiMZU6zC?cluster=devnet) |
+| Transactions that paid the services wallet | 27 (0 failed) | [services wallet](https://explorer.solana.com/address/DL7YweYxDerw3BgpmBG9PpePZC8VfwncpC2fo7CL4uXf?cluster=devnet) |
+| Agent payments confirmed | 27 (0 failed), 0.18 USDC in total | [one of them](https://explorer.solana.com/tx/YY28x3JH4uCShY9yBrqAW2YtdXo2trUQSeyviMLpUTGuVbYPWpFyZ6Nau6TRYs9V5gMV6g9Uw4wVJLbXTHHmeLf?cluster=devnet) |
 | Fees paid by task wallets | 0 SOL, they never hold SOL | any payment above: fee payer is the sponsor |
 | Overspends that succeeded | 0, a wallet cannot send what it does not hold | any task wallet |
-| Payments refused for an unlisted payee | 2 | task pages, red lines |
-| Owner asks: approved / declined | 3 / 1 | task pages |
+| Payments refused for an unlisted payee | 3 | task pages, red lines |
+| Owner asks: approved / declined | 4 / 2 | task pages |
 | USDC swept back to owners | 0.06 | task pages, sweep transactions |
-| Receipts anchored on chain | 3 of 4 tasks | [da323a](https://explorer.solana.com/tx/4xsHE3xW5Vwwda9ofncTi6nh3hfqTXBqpe79xS7U62XXfbApyoYQXDK7Via9ourW6S3FaJpS1pyBjeEqqhzEJBLx?cluster=devnet), [8950bc](https://explorer.solana.com/tx/iQHQrSyK4DHfTkfGihQpP16bovxdYvLHUvohUZGs5fn97tAhtaQ66jE76tL5ePdeNabFpBRJ4y3xU7Q4VZFy9yU?cluster=devnet), [9d2401](https://explorer.solana.com/tx/NLTKCXz7H8R2qQ8wP4VbPMfaQviydG9Bc3vunHfaRyXcMwga8TafcHS4EKCLnmm2PnHQhuJGNEmGEfuAKg8iW8Z?cluster=devnet) |
-| Hash-chained log entries | 58 | /verify/<task> recomputes them in your browser |
-| Payment confirmed, median | 778 ms | task pages, "confirmed in" column |
+| Receipts anchored on chain | 4 of 4 tasks | [f8e991](https://explorer.solana.com/tx/5PJsYYiDumYwVChhxtx3wK2YE3Xp2ksWp1RxQcQNTTNRkcgi1P9TBZuFmfiFVaucwmpLu1ggBKpmyRZTwytxdDVD?cluster=devnet), [da323a](https://explorer.solana.com/tx/4xsHE3xW5Vwwda9ofncTi6nh3hfqTXBqpe79xS7U62XXfbApyoYQXDK7Via9ourW6S3FaJpS1pyBjeEqqhzEJBLx?cluster=devnet), [8950bc](https://explorer.solana.com/tx/iQHQrSyK4DHfTkfGihQpP16bovxdYvLHUvohUZGs5fn97tAhtaQ66jE76tL5ePdeNabFpBRJ4y3xU7Q4VZFy9yU?cluster=devnet) |
+| Hash-chained log entries | 85 | /verify/<task> recomputes them in your browser |
+| Payment confirmed, median | 804 ms | task pages, "confirmed in" column |
 | Owner signature to confirmed funding, median | 922 ms | owner.approved log lines |
 | Sponsor SOL left | 9.994 | [sponsor wallet](https://explorer.solana.com/address/DX7jAZax87KtAiSEv85ArXViU8heEjkf9CRUMiMZU6zC?cluster=devnet) |
 
