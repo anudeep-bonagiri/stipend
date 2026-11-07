@@ -44,3 +44,6 @@ next-env.d.ts
 .keys/
 data/
 .env.local
+docs/video/*.mp4
+docs/video/*.json
+docs/video/frames/

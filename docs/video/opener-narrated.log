@@ -1,0 +1,1 @@
+opener-narrated done in 92 s, 6.8 MB, status completed usage {"total_tokens":88745,"total_input_tokens":302,"input_tokens_by_modality":[{"modality":"text","tokens":302}],"total_cached_tokens":0,"total_output_tokens":86880,"output_tokens_by_modality":[{"modality":"video","tokens":86880}],"total_tool_use_tokens":0,"total_thought_tokens":1563,"initial_input_tokens":302}
