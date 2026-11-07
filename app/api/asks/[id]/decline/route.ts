@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 import { declineAsk } from "@/lib/broker";
 
 export async function POST(_req: Request, ctx: { params: Promise<{ id: string }> }) {

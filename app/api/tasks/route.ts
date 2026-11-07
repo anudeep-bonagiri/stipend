@@ -1,9 +1,10 @@
-export const dynamic = "force-dynamic";
+import { connection } from "next/server";
 import { createTask } from "@/lib/broker";
 import { toMicro } from "@/lib/chain";
 import { tasks } from "@/lib/db";
 
 export async function GET() {
+  await connection(); // always live, never prerendered
   return Response.json({ tasks: tasks.list().map(({ wallet_secret: _s, ...t }) => t) });
 }
 

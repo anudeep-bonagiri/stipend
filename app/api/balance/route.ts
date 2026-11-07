@@ -1,8 +1,9 @@
-export const dynamic = "force-dynamic";
+import { connection } from "next/server";
 import { PublicKey } from "@solana/web3.js";
 import { fromMicro, usdcBalance } from "@/lib/chain";
 
 export async function GET(req: Request) {
+  await connection(); // always live, never prerendered
   const pubkey = new URL(req.url).searchParams.get("pubkey") ?? "";
   try {
     return Response.json({ usdc: fromMicro(await usdcBalance(new PublicKey(pubkey))) });
