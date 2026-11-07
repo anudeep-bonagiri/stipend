@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { requirePayment } from "@/lib/x402";
 import { gemini } from "@/lib/llm";
 

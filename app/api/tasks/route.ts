@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { createTask } from "@/lib/broker";
 import { toMicro } from "@/lib/chain";
 import { tasks } from "@/lib/db";

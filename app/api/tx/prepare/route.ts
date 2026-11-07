@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { connection } from "@/lib/chain";
 import { USDC_MINT, USDC_DECIMALS, CLUSTER } from "@/lib/env";
 import { sponsor } from "@/lib/keys";
