@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 import { PublicKey } from "@solana/web3.js";
 import { mintDemoUsdc, toMicro } from "@/lib/chain";
 

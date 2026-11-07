@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 import { requirePayment } from "@/lib/x402";
 import { tavily } from "@/lib/llm";
 
