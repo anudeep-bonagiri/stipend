@@ -62,7 +62,9 @@ async function main() {
       await runTask(task.id);
     } else {
       const { declineAsk } = await import("../lib/broker");
-      await declineAsk(pending.id);
+      const nacl = (await import("tweetnacl")).default;
+      const sig = Buffer.from(nacl.sign.detached(new TextEncoder().encode(`stipend:decline:${pending.id}`), owner.secretKey)).toString("base64");
+      await declineAsk(pending.id, sig);
       console.log("owner declines");
     }
     decisions++;

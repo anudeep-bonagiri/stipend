@@ -71,7 +71,7 @@ export default function Home() {
         </div>
         <div className="summary">
           <div className="k">Spent today</div>
-          <div className="n">{feed ? `${usdc(feed.spent_today_micro)} USDC` : "–"}</div>
+          <div className="n">{feed ? `${usdc(feed.spent_today_micro)} test USDC` : "–"}</div>
           <ul><li>{feed?.payments_today ?? 0} payments, {stats?.payments_failed ?? 0} failed</li><li>{stats?.payments_refused_unlisted_payee ?? 0} payments to strangers refused, all time</li><li>Test money on devnet</li></ul>
         </div>
       </section>
@@ -105,12 +105,12 @@ export default function Home() {
           {stats && <>
             {tile("payments confirmed", stats.payments_confirmed, true)}
             {tile("payments failed", stats.payments_failed)}
-            {tile("fees paid by task wallets", `${stats.fees_paid_by_task_wallets_sol} SOL`)}
+            {tile("task wallets that ever held SOL", stats.task_wallets_that_ever_held_sol != null ? `${stats.task_wallets_that_ever_held_sol} of ${stats.task_wallets_checked}` : "checking")}
             {tile("overspends that succeeded", stats.overspend_succeeded)}
             {tile("receipts anchored", stats.receipts_anchored, true)}
             {tile("USDC swept back", stats.usdc_swept_back)}
             {tile("payment confirmed, median", stats.payment_ms_median != null ? `${stats.payment_ms_median} ms` : null, true)}
-            {tile("drills: took the bait / stranger paid", stats.drills_run != null ? `${stats.drills_model_took_bait} of ${stats.drills_run} / ${stats.stranger_usdc_received}` : null)}
+            {tile("drills: took the bait / stranger holds", stats.drills_run != null ? `${stats.drills_model_took_bait} of ${stats.drills_run} / ${stats.stranger_usdc_received ?? "?"}` : null)}
           </>}
         </div>
       </section>

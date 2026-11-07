@@ -23,3 +23,10 @@ export async function signFunding(owner: Keypair, taskWallet: string, micro: big
   tx.partialSign(owner);
   return tx.serialize({ requireAllSignatures: false, verifySignatures: false }).toString("base64");
 }
+
+import nacl from "tweetnacl";
+/** Declining is also a signature only the owner can make: an ed25519 signature over "stipend:decline:<askId>". */
+export function signDecline(owner: Keypair, askId: string): string {
+  const msg = new TextEncoder().encode(`stipend:decline:${askId}`);
+  return Buffer.from(nacl.sign.detached(msg, owner.secretKey)).toString("base64");
+}

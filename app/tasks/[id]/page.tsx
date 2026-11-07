@@ -59,7 +59,7 @@ function TaskPageInner() {
       </section>
 
       <section className="card">
-        <div className="flex items-baseline justify-between"><h2 className="font-semibold">The envelope</h2><span className="muted text-xs">the wallet holds {balance_usdc ?? "–"} USDC right now</span></div>
+        <div className="flex items-baseline justify-between"><h2 className="font-semibold">The envelope</h2><span className="muted text-xs">the wallet holds {balance_usdc ?? "–"} test USDC right now</span></div>
         <div className="mt-3"><BudgetBar budget={task.budget_micro} spent={spent} swept={task.swept_micro} holding={balance_usdc != null ? Math.round(balance_usdc * 1e6) : null} /></div>
         <p className="muted mt-3 text-xs">A task can only spend what is in its wallet. Fees for every payment were paid by the sponsor; this wallet never held SOL.</p>
       </section>

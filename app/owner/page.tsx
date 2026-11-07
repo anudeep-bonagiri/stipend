@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Keypair } from "@solana/web3.js";
 import { createOwner, forgetOwner, loadOwner } from "@/lib/client/owner";
-import { signFunding } from "@/lib/client/fund";
+import { signDecline, signFunding } from "@/lib/client/fund";
 import { addrUrl, txUrl, short, usdc } from "@/lib/client/format";
 import { Phone } from "@/components/Phone";
 
@@ -44,8 +44,8 @@ export default function OwnerPage() {
     setBusy(null); refresh();
   }
   async function decline(a: Ask) {
-    setBusy(a.id);
-    const r = await fetch(`/api/asks/${a.id}/decline`, { method: "POST" }); const d = await r.json();
+    if (!owner) return; setBusy(a.id);
+    const r = await fetch(`/api/asks/${a.id}/decline`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ signature: signDecline(owner, a.id) }) }); const d = await r.json();
     setLog((l) => [{ text: r.ok ? `Declined ${usdc(a.micro)} USDC for "${a.goal}". The task ends and its leftover sweeps back.` : `Decline failed: ${d.error}` }, ...l]);
     setBusy(null); refresh();
   }
@@ -80,7 +80,7 @@ export default function OwnerPage() {
       <Phone>
         <div className="flex items-baseline justify-between">
           <div><div className="font-semibold text-lg">Stipend</div><div className="muted text-xs">Owner · {owner ? short(pub!) : "no key yet"}</div></div>
-          <div className="text-right"><div className="muted text-xs">USDC</div><div className="font-semibold text-xl">{balance ?? "–"}</div></div>
+          <div className="text-right"><div className="muted text-xs">test USDC</div><div className="font-semibold text-xl">{balance ?? "–"}</div></div>
         </div>
         <div className="mt-5 mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider muted">Needs you {asks.length ? <span className="pill">{asks.length}</span> : null}</div>
         <div className="space-y-3">
@@ -95,7 +95,7 @@ export default function OwnerPage() {
               <div className="muted mt-1 text-xs">into task wallet <a className="mono" href={addrUrl(a.wallet_pubkey)} target="_blank" rel="noreferrer">{short(a.wallet_pubkey)}</a></div>
               {a.risk.length > 0 && <div className="mt-2 flex flex-wrap gap-1">{a.risk.map((r) => <span key={r} className="chip chip-warn">{r}</span>)}</div>}
               <div className="mt-3 flex gap-2">
-                <button className="btn-phone" disabled={!!busy} onClick={() => decline(a)}>Decline</button>
+                <button className="btn-phone" disabled={!owner || !!busy} onClick={() => decline(a)}>Decline</button>
                 <button className="btn-phone go" disabled={!owner || !!busy || (balance ?? 0) < a.micro / 1e6} onClick={() => approve(a)}>{busy === a.id ? "Signing…" : "Approve and sign"}</button>
               </div>
             </div>

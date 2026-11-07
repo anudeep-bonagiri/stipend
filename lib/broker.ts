@@ -1,5 +1,9 @@
 import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
-import { ata, anchorMemo, connection, fromMicro, readPayment, sweepUsdc, transferUsdc, usdcBalance } from "./chain";
+import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, decodeTransferCheckedInstruction } from "@solana/spl-token";
+import { MEMO_PROGRAM_ID } from "@solana/spl-memo";
+import nacl from "tweetnacl";
+import { ata, anchorMemo, connection, fromMicro, readPayment, sweepUsdc, transferUsdc, usdcBalance, usdcMint } from "./chain";
+import { USDC_DECIMALS } from "./env";
 import { asks, events, newId, now, payments, tasks, Task, Ask } from "./db";
 import { sponsor } from "./keys";
 import { SERVICES, ServiceName, servicesWallet } from "./services";
@@ -33,9 +37,47 @@ export function createTask(goal: string, budgetMicro: bigint, ownerPubkey: strin
 }
 
 /**
+ * What the sponsor will sign, and nothing else: exactly three instructions.
+ *   1. create the task's token account (idempotent), paid by the sponsor
+ *   2. transferChecked of exactly the ask's amount, from the owner's token account
+ *      to the task's, signed by the owner
+ *   3. one memo, signed by the owner
+ * The sponsor must appear only as fee payer and as the rent payer in step 1.
+ */
+export function assertFundingShape(tx: Transaction, task: Task, ask: Ask) {
+  const payer = sponsor().publicKey;
+  const mint = usdcMint();
+  const owner = new PublicKey(task.owner_pubkey);
+  const taskPk = new PublicKey(task.wallet_pubkey);
+  const src = ata(owner), dst = ata(taskPk);
+  if (!tx.feePayer?.equals(payer)) throw new Error("fee payer must be the sponsor");
+  const ixs = tx.instructions;
+  if (ixs.length !== 3) throw new Error(`expected 3 instructions, got ${ixs.length}`);
+  const [a, t, m] = ixs;
+  // 1. associated token account, idempotent
+  if (!a.programId.equals(ASSOCIATED_TOKEN_PROGRAM_ID)) throw new Error("instruction 1 is not the associated token program");
+  if (!(a.data.length === 1 && a.data[0] === 1)) throw new Error("instruction 1 is not the idempotent create");
+  if (!(a.keys[0]?.pubkey.equals(payer) && a.keys[1]?.pubkey.equals(dst) && a.keys[2]?.pubkey.equals(taskPk) && a.keys[3]?.pubkey.equals(mint))) throw new Error("instruction 1 does not create the task's token account");
+  // 2. the transfer
+  if (!t.programId.equals(TOKEN_PROGRAM_ID)) throw new Error("instruction 2 is not the token program");
+  const d = decodeTransferCheckedInstruction(t);
+  if (!d.keys.source.pubkey.equals(src)) throw new Error("transfer source is not the owner's token account");
+  if (!d.keys.destination.pubkey.equals(dst)) throw new Error("transfer destination is not the task's token account");
+  if (!d.keys.mint.pubkey.equals(mint)) throw new Error("transfer is not the configured mint");
+  if (!d.keys.owner.pubkey.equals(owner)) throw new Error("transfer is not signed by the task's owner");
+  if (d.keys.multiSigners.length) throw new Error("unexpected multisig signers");
+  if (d.data.amount !== BigInt(ask.micro)) throw new Error(`transfer amount ${d.data.amount} does not equal the ask ${ask.micro}`);
+  if (d.data.decimals !== USDC_DECIMALS) throw new Error("wrong decimals");
+  // 3. the memo
+  if (!m.programId.equals(MEMO_PROGRAM_ID)) throw new Error("instruction 3 is not the memo program");
+  // the sponsor is never a signer or writable account anywhere but the ATA rent in step 1
+  for (const ix of [t, m]) for (const k of ix.keys) if (k.pubkey.equals(payer)) throw new Error("the sponsor may not appear in the transfer or memo");
+}
+
+/**
  * The owner approved: they signed a USDC transfer into the task wallet in their
- * browser. The box adds the sponsor's fee signature, sends it, and reads it back
- * from the chain before believing it.
+ * browser. The box checks the transaction is exactly the shape it will pay for,
+ * adds the sponsor's fee signature, sends it, and reads it back from the chain.
  */
 export async function approveAsk(askId: string, signedTxBase64: string): Promise<string> {
   const ask = asks.get(askId);
@@ -44,7 +86,7 @@ export async function approveAsk(askId: string, signedTxBase64: string): Promise
   const task = tasks.get(ask.task_id)!;
   const payer = sponsor();
   const tx = Transaction.from(Buffer.from(signedTxBase64, "base64"));
-  if (!tx.feePayer?.equals(payer.publicKey)) throw new Error("fee payer must be the sponsor");
+  assertFundingShape(tx, task, ask);
   tx.partialSign(payer);
   const t0 = now();
   const sig = await connection.sendRawTransaction(tx.serialize(), { skipPreflight: false });
@@ -62,13 +104,18 @@ export async function approveAsk(askId: string, signedTxBase64: string): Promise
   return sig;
 }
 
-export async function declineAsk(askId: string) {
+/** The message an owner signs to decline. No transaction, but still a signature only the owner can make. */
+export const declineMessage = (askId: string) => new TextEncoder().encode(`stipend:decline:${askId}`);
+
+export async function declineAsk(askId: string, signatureBase64: string) {
   const ask = asks.get(askId);
   if (!ask) throw new Error("ask not found");
   if (ask.status !== "pending") throw new Error(`ask is ${ask.status}`);
-  asks.update(askId, { status: "declined", decided_at: now() });
-  events.append(ask.task_id, "owner.declined", { ask: askId, usdc: fromMicro(BigInt(ask.micro)) });
   const task = tasks.get(ask.task_id)!;
+  const ok = nacl.sign.detached.verify(declineMessage(askId), Buffer.from(signatureBase64, "base64"), new PublicKey(task.owner_pubkey).toBytes());
+  if (!ok) throw new Error("decline must be signed by the task's owner");
+  asks.update(askId, { status: "declined", decided_at: now() });
+  events.append(ask.task_id, "owner.declined", { ask: askId, usdc: fromMicro(BigInt(ask.micro)), signed: true });
   const draft = task.state ? (JSON.parse(task.state).draft as string | undefined) : undefined;
   await finishTask(ask.task_id, { status: "declined", answer: draft ?? null });
 }

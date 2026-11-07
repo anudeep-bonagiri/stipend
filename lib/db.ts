@@ -60,6 +60,10 @@ CREATE TABLE IF NOT EXISTS asks (
   created_at INTEGER NOT NULL,
   decided_at INTEGER
 );
+CREATE TABLE IF NOT EXISTS faucet_grants (
+  pubkey TEXT NOT NULL,
+  granted_at INTEGER NOT NULL
+);
 CREATE TABLE IF NOT EXISTS used_sigs (
   sig TEXT PRIMARY KEY,
   service TEXT NOT NULL,
@@ -127,6 +131,17 @@ export const asks = {
   update: (id: string, fields: Partial<Ask>) => {
     const keys = Object.keys(fields);
     db.prepare(`UPDATE asks SET ${keys.map((k) => `${k} = @${k}`).join(", ")} WHERE id = @id`).run({ ...fields, id });
+  },
+};
+
+export const faucet = {
+  /** One grant per wallet per hour, five grants per wallet ever. Demo money, but not an open tap. */
+  allow: (pubkey: string): string | null => {
+    const rows = db.prepare(`SELECT granted_at FROM faucet_grants WHERE pubkey = ? ORDER BY granted_at DESC`).all(pubkey) as { granted_at: number }[];
+    if (rows.length >= 5) return "this wallet has had five grants already";
+    if (rows[0] && now() - rows[0].granted_at < 3_600_000) return "one grant per wallet per hour";
+    db.prepare(`INSERT INTO faucet_grants (pubkey, granted_at) VALUES (?, ?)`).run(pubkey, now());
+    return null;
   },
 };
 

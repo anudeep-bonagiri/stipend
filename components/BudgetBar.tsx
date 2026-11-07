@@ -1,4 +1,4 @@
-import { usdc } from "@/lib/client/format";
+import { usdc, UNIT } from "@/lib/client/format";
 
 export function BudgetBar({ budget, spent, swept, holding }: { budget: number; spent: number; swept: number | null; holding: number | null }) {
   const total = Math.max(budget, spent + (swept ?? 0) + (holding ?? 0), 1);
@@ -12,9 +12,9 @@ export function BudgetBar({ budget, spent, swept, holding }: { budget: number; s
         {left > 0 && <div className="left" style={{ width: pct(left) }} />}
       </div>
       <div className="legend">
-        <span><i style={{ background: "var(--accent)" }} />spent {usdc(spent)} USDC</span>
-        {swept != null ? <span><i style={{ background: "rgba(52,211,153,0.35)" }} />swept back {usdc(swept)} USDC</span> : <span><i style={{ background: "rgba(52,211,153,0.18)" }} />left in the envelope {usdc(left)} USDC</span>}
-        <span className="ml-auto">budget {usdc(budget)} USDC</span>
+        <span><i style={{ background: "var(--accent)" }} />spent {usdc(spent)} {UNIT}</span>
+        {swept != null ? <span><i style={{ background: "rgba(52,211,153,0.35)" }} />swept back {usdc(swept)} {UNIT}</span> : <span><i style={{ background: "rgba(52,211,153,0.18)" }} />left in the envelope {usdc(left)} {UNIT}</span>}
+        <span className="ml-auto">budget {usdc(budget)} {UNIT}</span>
       </div>
     </div>
   );
