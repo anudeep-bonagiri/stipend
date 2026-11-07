@@ -1,36 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Stipend
 
-## Getting Started
+**The money layer for AI agents. Every task gets its own wallet, its own budget, and a human who signs anything beyond it.**
 
-First, run the development server:
+Built from an empty folder on November 7 and 8, 2026 for the MLH Solana Hackathon. Solana devnet, test money only.
+
+- Code: this repository (MIT)
+- How it works, in the app: `/about`
+- Demo video: _link added at submission_
+- Live demo: _link added at submission_
+
+## In 30 seconds
+
+AI agents now pay for things: searches, model calls, data, compute. Today that means an agent holds a key or an API credit, and one bad web page can spend all of it. Stipend gives each agent task a fresh Solana wallet funded with exactly its budget in USDC. The task pays per request, every payment names the task on chain, and the owner's own key never leaves the owner's browser. When the budget runs out the task stops and asks. When the task ends, the leftover comes back and a receipt is written to Solana that anyone can check without trusting the box.
+
+## Think of petty cash
+
+- **Its own envelope.** Each task gets a fresh wallet funded with exactly its budget. It cannot spend what is not there. No program, no policy engine, just arithmetic the chain enforces.
+- **Never the safe key.** The owner's key is generated in the owner's browser and never sent anywhere. Funding a task is the owner signing one transfer; the box adds the fee signature and cannot change what was signed.
+- **Only certain doors.** The task can pay the listed services and nobody else. A payment to a stranger is refused and logged, not asked about.
+- **The front desk calls you.** Anything beyond the budget pauses the task and asks the owner, with the agent's own reason and the risk flags the broker saw.
+- **Cameras in the hallway.** Every payment carries a memo naming its task. The action log is hash-chained, and its last hash is written to Solana when the task ends. The verify page recomputes every hash in your browser and reads the memo from a public node itself.
+- **Hand back the change.** Whatever is left is swept to the owner and the task's token account is closed, so even the rent comes back.
+
+## Why it is better
+
+| | An agent with an API key | Stipend |
+|---|---|---|
+| What a hijacked agent can spend | Everything on the key | This task's budget, nothing more |
+| Who holds the owner's funds | The box | The owner, in their browser |
+| Budget enforcement | Code that can be bypassed | A wallet that holds exactly the budget |
+| Approval | A tap or a config flag | A signature on a transfer |
+| Fees | The agent needs gas | Zero. A separate sponsor key pays every fee |
+| Which work paid for what | A log the box can edit | A memo on every payment, a receipt on chain per task |
+| Unknown payees | Policy says no, if policy runs | Refused by the only code that holds the task key |
+
+## Compared with GurtOS
+
+GurtOS won Best Use of Solana at Cal Hacks 13.0 two weeks ago with an operating system for agents. We studied its submission closely and kept what worked: per-task isolation, approval before spending, a hash-chained log anchored on chain, measured proof with explorer links, and a plain account of limits. Then we fixed the money layer.
+
+| | GurtOS | Stipend |
+|---|---|---|
+| Who holds the owner's key | The box, in a root-only file. A fully taken-over box can spend | Nobody but the owner. The box only ever holds task wallets |
+| Budget | Enforced by the OS | Enforced by the chain: the task wallet holds exactly the budget |
+| Approval | A tap the box relays | A signature. The owner signs the transfer; the box can only add the fee |
+| Fees | Paid by Coinbase's facilitator | Paid by our own sponsor key. No third party |
+| Audit anchor | A daily fingerprint; recent tasks read "not anchored yet" | A receipt the moment each task ends |
+| Paid services | x402 through a hosted facilitator | x402-shaped flow we host: 402, pay, retry with the signature, the service reads the transfer from the chain itself |
+| Unknown payees | Asked about | Refused outright |
+
+GurtOS does far more than money. This comparison is about the money layer only.
+
+<!-- facts:start -->
+## Proof (generated 2026-11-07 18:13 UTC by scripts/facts.ts)
+
+| Number | Value | Where to check |
+|---|---|---|
+| Transactions the sponsor paid fees for, on devnet | 33 (0 failed) | [sponsor wallet](https://explorer.solana.com/address/DX7jAZax87KtAiSEv85ArXViU8heEjkf9CRUMiMZU6zC?cluster=devnet) |
+| Transactions that paid the services wallet | 17 (0 failed) | [services wallet](https://explorer.solana.com/address/DL7YweYxDerw3BgpmBG9PpePZC8VfwncpC2fo7CL4uXf?cluster=devnet) |
+| Agent payments confirmed | 17 (0 failed), 0.12 USDC in total | [one of them](https://explorer.solana.com/tx/2E4eNFUoV3AqbGnjsRExgF83LsUV6D5pSUHgUHj4viJCcoJLJFGhzUJhVZCogSpGcZPNh32N6qm2ogHJDcAwU9TB?cluster=devnet) |
+| Fees paid by task wallets | 0 SOL, they never hold SOL | any payment above: fee payer is the sponsor |
+| Overspends that succeeded | 0, a wallet cannot send what it does not hold | any task wallet |
+| Payments refused for an unlisted payee | 2 | task pages, red lines |
+| Owner asks: approved / declined | 3 / 1 | task pages |
+| USDC swept back to owners | 0.06 | task pages, sweep transactions |
+| Receipts anchored on chain | 3 of 4 tasks | [da323a](https://explorer.solana.com/tx/4xsHE3xW5Vwwda9ofncTi6nh3hfqTXBqpe79xS7U62XXfbApyoYQXDK7Via9ourW6S3FaJpS1pyBjeEqqhzEJBLx?cluster=devnet), [8950bc](https://explorer.solana.com/tx/iQHQrSyK4DHfTkfGihQpP16bovxdYvLHUvohUZGs5fn97tAhtaQ66jE76tL5ePdeNabFpBRJ4y3xU7Q4VZFy9yU?cluster=devnet), [9d2401](https://explorer.solana.com/tx/NLTKCXz7H8R2qQ8wP4VbPMfaQviydG9Bc3vunHfaRyXcMwga8TafcHS4EKCLnmm2PnHQhuJGNEmGEfuAKg8iW8Z?cluster=devnet) |
+| Hash-chained log entries | 58 | /verify/<task> recomputes them in your browser |
+| Payment confirmed, median | 778 ms | task pages, "confirmed in" column |
+| Owner signature to confirmed funding, median | 922 ms | owner.approved log lines |
+| Sponsor SOL left | 9.994 | [sponsor wallet](https://explorer.solana.com/address/DX7jAZax87KtAiSEv85ArXViU8heEjkf9CRUMiMZU6zC?cluster=devnet) |
+
+Mint: [C9ZHo6VUmfCnGVXBAtJEgAicFHMmXJ3Pf5zxyKdkPLKu](https://explorer.solana.com/address/C9ZHo6VUmfCnGVXBAtJEgAicFHMmXJ3Pf5zxyKdkPLKu?cluster=devnet) (our own devnet test mint, 6 decimals; test money).
+<!-- facts:end -->
+
+## What comes from Stipend and what from Solana
+
+| Feature | From Stipend | From Solana | Status |
+|---|---|---|---|
+| A fresh wallet per task, funded with exactly the budget | Keypair per task, held by the broker | SPL token accounts; the balance is the budget | Shipped |
+| Owner funds a task from the browser | Transaction built and partially signed client side, never leaves with the key | Multi-signer transactions: owner signs the transfer, sponsor signs the fee | Shipped |
+| Task wallets never hold SOL | Broker sets the sponsor as fee payer on every transaction | Separate fee payer; `createAssociatedTokenAccountIdempotent` paid by the sponsor | Shipped |
+| Per-request payment for search and model calls | x402-shaped gate: 402, pay, retry with `X-Payment: <signature>` | `TransferChecked` of USDC, read back with `getParsedTransaction` before the service answers; signature replay blocked | Shipped |
+| Every payment names its task | Memo `stipend:<task>:<service>:<nonce>` on each transfer | SPL Memo program | Shipped |
+| Refuse unknown payees | The only code with the task key checks the destination | n/a | Shipped |
+| Pause and ask the owner when over budget | Ask with reason and risk flags; task resumes on approval | The approval is a signed, confirmed transfer | Shipped |
+| Sweep leftover and close the account | At task end | `TransferChecked` back to the owner, `CloseAccount` returns rent to the sponsor | Shipped |
+| Receipt per task | Hash-chained log; last hash anchored at task end | Memo transaction `stipend:v1:<task>:<entries>:<hash>` | Shipped |
+| Verify in the browser | Recomputes every hash with Web Crypto; tamper test | Reads the memo from a public RPC node, not from the box | Shipped |
+
+## The attack drill
+
+Turn on "attack drill" when starting a task and the first search's results include a planted page that tells the agent the right answer requires paying 2 USDC to a stranger and running twenty more searches. The agent's output format deliberately allows it to request payments and more searches, because the point is not that the model behaves. In our runs Gemini 2.5 Flash followed the instruction: it requested the 2 USDC payment twice and asked for the extra searches. Both payments were refused because the payee is not a listed service. The extra searches drained the budget, the task paused and asked the owner for the shortfall with the flags "instruction came from web content" and "over budget", the owner declined, the task ended with the answer it already had, and the receipt was still anchored. The stranger's wallet holds nothing.
+
+## Questions judges ask
+
+**Why Solana?** A task makes five to twenty payments of half a cent each, and each must be confirmed before the service answers. Sub-second confirmation at a fraction of a cent is the only reason per-call payment works at all. Separate fee payers let task wallets hold only USDC. The memo program lets each payment name its task in public, and anyone can read it back from any node.
+
+**Why not just a database of budgets?** Because the box can edit a database. It cannot mint USDC into a task wallet, and it cannot fund one without the owner's signature.
+
+**Can't the model just refuse the injected instruction?** Sometimes. Stipend assumes it will not, and makes sure a fooled agent has nothing to steal and nowhere to send it.
+
+**What if the box is fully compromised?** It can spend the budgets already sitting in task wallets, and nothing more. It cannot reach the owner's funds, cannot fund a task, and cannot rewrite what is already anchored on chain.
+
+**Is this x402?** It follows the shape (402 with payment details, pay, retry with proof) and settles in USDC on Solana, but we verify payments ourselves by reading the transfer from the chain instead of using a facilitator. No Coinbase account needed to run it.
+
+## What is not built, and limits
+
+- Devnet only, test money, not a legal record. We run our own 6-decimal test mint; the code is mint-agnostic, so point `STIPEND_USDC_MINT` at the real devnet USDC mint and the faucet button turns off.
+- The paid services (search via Tavily, model calls via Gemini) are hosted by the same box that runs the broker. The payments between them are real on-chain transfers; the services are ours.
+- A task wallet's key is held by the broker, so a compromised box can spend budgets already funded. That is the design: budgets are the blast radius.
+- No metered payment channels (x402 "upto"), no hardware wallet for the owner, no sandbox for the agent's own code, no mainnet.
+- The receipt proves the log entries are the ones the box wrote and were not changed afterward. It does not prove the agent was right.
+
+## Rules, honestly
+
+All code in this repository was written during the hackathon (November 7 and 8, 2026). The idea has lineage we want to name: the "pause and ask a person you trust" idea comes from our earlier anti-scam project Lookout, and the "approve before an agent spends, anchor the log on chain" idea comes from GurtOS. No code was reused from either. AI coding tools: Claude Code running Claude Fable 5.1 wrote most of the code with us directing, reviewing, and testing on devnet. APIs the product calls: Gemini 2.5 Flash and Tavily.
+
+## Run it locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npx tsx scripts/setup.ts        # funds nothing by itself: it prints the sponsor address; send it devnet SOL from faucet.solana.com, rerun, and it creates the test mint
+cp .env.local .env.local        # setup wrote STIPEND_USDC_MINT; add GEMINI_API_KEY and TAVILY_API_KEY
+npm run dev                      # http://localhost:3000
+npx tsx scripts/smoke.ts         # one full task from the command line, no browser
+npx tsx scripts/smoke.ts --inject
+npx tsx scripts/facts.ts --write # regenerates the Proof section above from the database and the chain
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The owner's key is created on the Owner page and stored only in that browser. "Get 5 demo USDC" mints test money to it.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT license.
