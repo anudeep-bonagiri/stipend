@@ -50,6 +50,14 @@ async function main() {
     ``,
     `Mint: [${USDC_MINT}](${explorerAddress(USDC_MINT)}) (our own devnet test mint, 6 decimals; test money).`,
   ];
-  console.log(lines.join("\n"));
+  const md = lines.join("\n");
+  console.log(md);
+  if (process.argv.includes("--write")) {
+    const fs = await import("node:fs");
+    const readme = fs.readFileSync("README.md", "utf8");
+    const out = readme.replace(/<!-- facts:start -->[\s\S]*<!-- facts:end -->/, `<!-- facts:start -->\n${md}\n<!-- facts:end -->`);
+    fs.writeFileSync("README.md", out);
+    console.log("\nREADME.md updated");
+  }
 }
 main().catch((e) => { console.error(e); process.exit(1); });
