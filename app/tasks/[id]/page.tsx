@@ -63,7 +63,7 @@ function TaskPageInner() {
       )}
 
       {task.answer && (
-        <section className="card"><h2 className="mb-1 font-semibold">Answer</h2><p className="whitespace-pre-wrap text-sm">{task.answer}</p></section>
+        <section className="card"><h2 className="mb-1 font-semibold">{task.status === "declined" ? "What the agent had written when the owner declined" : "Answer"}</h2><p className="whitespace-pre-wrap text-sm">{task.answer}</p></section>
       )}
 
       <section className="card">
