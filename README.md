@@ -6,8 +6,8 @@ Built from an empty folder on November 7 and 8, 2026 for the MLH Solana Hackatho
 
 - Code: this repository (MIT)
 - How it works, in the app: `/about`
-- Demo video: _link added at submission_
-- Live demo: _link added at submission_
+- Demo video: https://youtu.be/ZfM1MX8hqJA (1080p download on the [v0.1.0 release](https://github.com/anudeep-bonagiri/stipend/releases/tag/v0.1.0))
+- Live demo: _see the submission_
 
 ## Screens
 
