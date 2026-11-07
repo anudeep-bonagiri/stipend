@@ -105,7 +105,7 @@ const segments = {
     const had = await seedOwner(ctx);
     await page.goto(`${BASE}/owner`); await page.waitForSelector("text=Owner"); mark("owner page");
     if (!had) { await sleep(800); await clickEl("button:has-text('Create an owner key')", "created key"); await sleep(1200); await saveOwner(page); }
-    await page.waitForSelector("text=USDC balance");
+    await page.waitForSelector("text=Owner wallet");
     const bal = await page.locator(".text-xl.font-semibold").first().innerText().catch(() => "0");
     if (parseFloat(bal) < 1) { await clickEl("button:has-text('Get 5 demo USDC')", "faucet"); await page.waitForSelector("text=Minted 5 demo USDC", { timeout: 60000 }); await sleep(1500); }
     await glide(600, 290, 30); await sleep(1800); mark("wallet shown");
@@ -157,7 +157,12 @@ const segments = {
       mark("bait card");
       await page.waitForSelector("text=The broker refused the payee", { timeout: 240000 }); mark("refused card");
       await page.evaluate(() => { const els = [...document.querySelectorAll('.defence')]; els[els.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); await sleep(2500);
-      await page.waitForSelector("text=stopped and asked you", { timeout: 240000 }); mark("asked card");
+      const next = await Promise.race([
+        page.waitForSelector("text=stopped and asked you", { timeout: 240000 }).then(() => "asked"),
+        page.waitForSelector(".chip-ok:has-text('finished')", { timeout: 240000 }).then(() => "finished"),
+      ]).catch(() => "timeout");
+      if (next !== "asked") { console.log(`  payment refused but the budget never ran out (${next}), attempt ${attempt}; retrying`); continue; }
+      mark("asked card");
       await page.evaluate(() => { const els = [...document.querySelectorAll('.defence')]; els[els.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); await sleep(2500);
       await page.goto(`${BASE}/owner`); await page.waitForSelector("text=instruction came from web content"); mark("phone ask with flags"); await sleep(2500);
       await clickEl("button:has-text('Decline')", "declined"); await page.waitForSelector("text=Declined 0.005", { timeout: 60000 }).catch(() => {}); await sleep(1800);
