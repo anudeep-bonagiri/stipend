@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Connection } from "@solana/web3.js";
 import { txUrl, short, when } from "@/lib/client/format";
@@ -24,7 +24,7 @@ async function recompute(events: Ev[]) {
   return out;
 }
 
-export default function VerifyPage() {
+function VerifyPageInner() {
   const { id } = useParams<{ id: string }>();
   const [v, setV] = useState<V | null>(null);
   const [rows, setRows] = useState<{ seq: number; ok: boolean }[]>([]);
@@ -83,4 +83,8 @@ export default function VerifyPage() {
       </section>
     </div>
   );
+}
+
+export default function VerifyPage() {
+  return <Suspense fallback={<p className="muted">Loading…</p>}><VerifyPageInner /></Suspense>;
 }

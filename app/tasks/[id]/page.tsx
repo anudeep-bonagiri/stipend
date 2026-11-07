@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { addrUrl, txUrl, short, usdc, when } from "@/lib/client/format";
@@ -10,7 +10,7 @@ type Ev = { seq: number; ts: number; type: string; data: string; hash: string };
 type Task = { id: string; goal: string; status: string; budget_micro: number; owner_pubkey: string; wallet_pubkey: string; injection: number; answer: string | null; funded_sig: string | null; sweep_sig: string | null; swept_micro: number | null; receipt_sig: string | null; receipt_hash: string | null };
 type Data = { task: Task; balance_usdc: number | null; payments: Payment[]; events: Ev[] };
 
-function describe(e: Ev): { text: React.ReactNode; tone?: "warn" | "ok" } {
+function describe(e: Ev, taskId: string): { text: React.ReactNode; tone?: "warn" | "ok" } {
   const d = JSON.parse(e.data);
   const link = (sig: string) => <a href={txUrl(sig)} target="_blank" rel="noreferrer">tx {short(sig)}</a>;
   switch (e.type) {
@@ -27,12 +27,12 @@ function describe(e: Ev): { text: React.ReactNode; tone?: "warn" | "ok" } {
     case "agent.error": return { text: <>Agent error: {d.error}</>, tone: "warn" };
     case "task.ended": return { text: <>Task ended: {d.status}.</> };
     case "task.swept": return { text: <>Swept {d.usdc} USDC back to the owner and closed the task&apos;s token account · {link(d.sig)}</>, tone: "ok" };
-    case "task.receipt": return { text: <>Receipt anchored on chain: hash of log entries 1 to {d.covers} · {link(d.sig)} · <Link href={`/verify/${e.hash && ""}`}>verify</Link></>, tone: "ok" };
+    case "task.receipt": return { text: <>Receipt anchored on chain: hash of log entries 1 to {d.covers} · {link(d.sig)} · <Link href={`/verify/${taskId}`}>verify</Link></>, tone: "ok" };
     default: return { text: <>{e.type} {e.data.slice(0, 120)}</> };
   }
 }
 
-export default function TaskPage() {
+function TaskPageInner() {
   const { id } = useParams<{ id: string }>();
   const [data, setData] = useState<Data | null>(null);
   useEffect(() => {
@@ -82,7 +82,7 @@ export default function TaskPage() {
       <section className="card">
         <h2 className="mb-2 font-semibold">Action log <span className="muted text-xs">hash-chained; the receipt at the end is written to Solana</span></h2>
         <ol className="space-y-1 text-sm">
-          {events.map((e) => { const d = describe(e); return (
+          {events.map((e) => { const d = describe(e, task.id); return (
             <li key={e.seq} className="flex gap-3" style={{ color: d.tone === "warn" ? "var(--warn)" : d.tone === "ok" ? "var(--ok)" : undefined }}>
               <span className="muted w-20 shrink-0">{when(e.ts)}</span><span>{d.text}</span>
             </li>
@@ -94,4 +94,8 @@ export default function TaskPage() {
       </section>
     </div>
   );
+}
+
+export default function TaskPage() {
+  return <Suspense fallback={<p className="muted">Loading…</p>}><TaskPageInner /></Suspense>;
 }
