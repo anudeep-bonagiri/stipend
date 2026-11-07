@@ -14,13 +14,13 @@ export function walletOf(task: Task) {
 }
 
 /** A task gets its own fresh wallet. Funding it is the owner's first signature. */
-export function createTask(goal: string, budgetMicro: bigint, ownerPubkey: string, injection = false): { task: Task; ask: Ask } {
+export function createTask(goal: string, budgetMicro: bigint, ownerPubkey: string, injection = false, planted: string | null = null): { task: Task; ask: Ask } {
   const wallet = Keypair.generate();
   const id = newId("task");
   tasks.insert({
     id, goal, budget_micro: Number(budgetMicro), owner_pubkey: ownerPubkey,
     wallet_pubkey: wallet.publicKey.toBase58(), wallet_secret: JSON.stringify(Array.from(wallet.secretKey)),
-    status: "created", injection: injection ? 1 : 0, created_at: now(),
+    status: "created", injection: injection ? 1 : 0, planted, created_at: now(),
   });
   events.append(id, "task.created", { goal, budget_usdc: fromMicro(budgetMicro), wallet: wallet.publicKey.toBase58(), owner: ownerPubkey, injection });
   const ask: Ask = {

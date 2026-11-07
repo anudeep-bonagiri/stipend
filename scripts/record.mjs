@@ -136,40 +136,34 @@ const segments = {
     mark("end");
   },
 
-  // Attack drill, end to end: create with the drill on, approve, watch the red lines, decline.
+  // Attack it yourself, end to end: pick the prepared page, run it, fund it on the phone, watch what stopped it, decline.
   // The model does not always take the bait; if it finishes clean, the run is retried with a new task.
-  async attack_drill({ page, ctx, mark, glide, clickEl, typeInto, scrollTo, sleep }) {
+  async attack_drill({ page, ctx, mark, glide, clickEl, scrollTo, sleep }) {
     await seedOwner(ctx);
     for (let attempt = 1; attempt <= 3; attempt++) {
-      await page.goto(`${BASE}/`); await page.waitForSelector("textarea"); mark("dashboard");
-      await typeInto("textarea", GOAL); await sleep(300);
-      await clickEl("input[type=checkbox]", "drill on"); await sleep(900);
-      await clickEl("button:has-text('Create task')", "create"); await page.waitForURL(/\/tasks\//); await sleep(1500);
+      await page.goto(`${BASE}/attack`); await page.waitForSelector("button:has-text('Run this attack')"); mark("attack page"); await sleep(1500);
+      await glide(700, 420, 30); await sleep(1200);
+      await clickEl("button:has-text('Run this attack')", "run"); await page.waitForURL(/task=/); await sleep(1800); mark("fund banner");
       const url = page.url();
-      await page.goto(`${BASE}/owner`); await page.waitForSelector("button:has-text('Approve and sign')"); await sleep(900);
-      await clickEl("button:has-text('Approve and sign')", "approve"); await page.waitForSelector("text=Approved 0.06 USDC", { timeout: 60000 }); mark("approved"); await sleep(1200);
-      await page.goto(url); await page.waitForSelector("text=Action log"); mark("task page");
-      await page.waitForSelector("text=planted page", { timeout: 120000 }); mark("planted line");
-      await scrollTo(380, 1000);
-      // Wait for the first of: a refusal, an owner ask with the web-content flag, or the task ending clean.
+      await page.goto(`${BASE}/owner`); await page.waitForSelector("button:has-text('Approve and sign')"); mark("phone ask"); await sleep(1200);
+      await clickEl("button:has-text('Approve and sign')", "approve"); await page.waitForSelector("text=Approved 0.06 USDC", { timeout: 60000 }); mark("approved"); await sleep(1000);
+      await page.goto(url); await page.waitForSelector("text=What happened"); mark("attack page back");
+      await page.waitForSelector("text=The planted page arrived", { timeout: 120000 }); mark("planted card"); await sleep(1500);
       const outcome = await Promise.race([
-        page.waitForSelector("text=Refused", { timeout: 240000 }).then(() => "refused"),
-        page.waitForSelector("text=instruction came from web content", { timeout: 240000 }).then(() => "asked"),
-        page.waitForSelector(".chip-ok:has-text('finished')", { timeout: 240000 }).then(() => "finished"),
+        page.waitForSelector("text=The model took the bait", { timeout: 240000 }).then(() => "bait"),
+        page.waitForSelector("text=The model ignored the page", { timeout: 240000 }).then(() => "clean"),
       ]).catch(() => "timeout");
-      if (outcome === "finished" || outcome === "timeout") { console.log(`  model did not take the bait (${outcome}), attempt ${attempt}; retrying`); continue; }
-      if (outcome === "refused") {
-        mark("refused line");
-        await page.evaluate(() => document.querySelector(".log li.warn")?.scrollIntoView({ behavior: "smooth", block: "center" })); await sleep(2500);
-        await page.waitForSelector("text=instruction came from web content", { timeout: 240000 });
-      }
-      mark("asked line");
-      await page.evaluate(() => { const els = [...document.querySelectorAll('.log li')]; els[els.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); await sleep(2500);
-      await page.goto(`${BASE}/owner`); await page.waitForSelector("text=instruction came from web content"); mark("owner ask with flags"); await sleep(2500);
-      await glide(500, 640, 30); await sleep(800);
-      await clickEl("button:has-text('Decline')", "declined"); await page.waitForSelector("text=Declined 0.005", { timeout: 60000 }).catch(() => {}); await sleep(2500);
-      await page.goto(url); await page.waitForSelector("text=declined"); mark("task declined"); await sleep(2000);
-      await page.evaluate(() => { const els = [...document.querySelectorAll('.log li')]; els[els.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); await sleep(3000);
+      if (outcome !== "bait") { console.log(`  model did not take the bait (${outcome}), attempt ${attempt}; retrying`); continue; }
+      mark("bait card");
+      await page.waitForSelector("text=The broker refused the payee", { timeout: 240000 }); mark("refused card");
+      await page.evaluate(() => { const els = [...document.querySelectorAll('.defence')]; els[els.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); await sleep(2500);
+      await page.waitForSelector("text=stopped and asked you", { timeout: 240000 }); mark("asked card");
+      await page.evaluate(() => { const els = [...document.querySelectorAll('.defence')]; els[els.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); await sleep(2500);
+      await page.goto(`${BASE}/owner`); await page.waitForSelector("text=instruction came from web content"); mark("phone ask with flags"); await sleep(2500);
+      await clickEl("button:has-text('Decline')", "declined"); await page.waitForSelector("text=Declined 0.005", { timeout: 60000 }).catch(() => {}); await sleep(1800);
+      await page.goto(url); await page.waitForSelector("text=You declined", { timeout: 60000 }); mark("declined card");
+      await page.waitForSelector("text=The receipt is on chain", { timeout: 90000 }).catch(() => {}); mark("receipt card");
+      await page.evaluate(() => { const els = [...document.querySelectorAll('.defence')]; els[els.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); await sleep(3000);
       return;
     }
     throw new Error("attack drill: the model never took the bait in 3 attempts");
@@ -181,7 +175,8 @@ const segments = {
     const tasks = await (await fetch(`${BASE}/api/tasks`)).json();
     const t = tasks.tasks.find((x) => x.status === "finished");
     await page.goto(`${BASE}/tasks/${t.id}`); await page.waitForSelector("text=Receipt anchored"); mark("task page");
-    await page.evaluate(() => { const els = [...document.querySelectorAll('.log li')]; els[els.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); mark("sweep and receipt"); await sleep(3500);
+    await sleep(1500);
+    await page.evaluate(() => { document.querySelector('img[alt^="QR code"]')?.closest('section')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); mark("sweep and receipt"); await sleep(3000);
     await page.goto(`${BASE}/verify/${t.id}`); await page.waitForSelector("text=log matches the receipt on Solana", { timeout: 60000 }); mark("verify green"); await sleep(2500);
     await glide(700, 400, 30); await sleep(800);
     await clickEl("button:has-text('Tamper test')", "tamper"); await page.waitForSelector("text=MISMATCH"); mark("mismatch"); await sleep(1200);

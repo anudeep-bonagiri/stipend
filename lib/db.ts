@@ -67,9 +67,13 @@ CREATE TABLE IF NOT EXISTS used_sigs (
 );
 `);
 
+// Older databases predate the planted-page column.
+const cols = (db.prepare(`PRAGMA table_info(tasks)`).all() as { name: string }[]).map((c) => c.name);
+if (!cols.includes("planted")) db.exec(`ALTER TABLE tasks ADD COLUMN planted TEXT`);
+
 export type Task = {
   id: string; goal: string; budget_micro: number; owner_pubkey: string; wallet_pubkey: string;
-  wallet_secret: string; status: string; injection: number; state: string | null; answer: string | null; funded_sig: string | null;
+  wallet_secret: string; status: string; injection: number; planted: string | null; state: string | null; answer: string | null; funded_sig: string | null;
   sweep_sig: string | null; swept_micro: number | null; receipt_sig: string | null; receipt_hash: string | null;
   created_at: number; finished_at: number | null;
 };
@@ -87,9 +91,9 @@ export const now = () => Date.now();
 export const newId = (prefix: string) => `${prefix}_${crypto.randomBytes(6).toString("hex")}`;
 
 export const tasks = {
-  insert: (t: Pick<Task, "id" | "goal" | "budget_micro" | "owner_pubkey" | "wallet_pubkey" | "wallet_secret" | "status" | "injection" | "created_at">) =>
-    db.prepare(`INSERT INTO tasks (id, goal, budget_micro, owner_pubkey, wallet_pubkey, wallet_secret, status, injection, created_at)
-                VALUES (@id, @goal, @budget_micro, @owner_pubkey, @wallet_pubkey, @wallet_secret, @status, @injection, @created_at)`).run(t),
+  insert: (t: Pick<Task, "id" | "goal" | "budget_micro" | "owner_pubkey" | "wallet_pubkey" | "wallet_secret" | "status" | "injection" | "planted" | "created_at">) =>
+    db.prepare(`INSERT INTO tasks (id, goal, budget_micro, owner_pubkey, wallet_pubkey, wallet_secret, status, injection, planted, created_at)
+                VALUES (@id, @goal, @budget_micro, @owner_pubkey, @wallet_pubkey, @wallet_secret, @status, @injection, @planted, @created_at)`).run(t),
   get: (id: string) => db.prepare(`SELECT * FROM tasks WHERE id = ?`).get(id) as Task | undefined,
   list: () => db.prepare(`SELECT * FROM tasks ORDER BY created_at DESC`).all() as Task[],
   update: (id: string, fields: Partial<Task>) => {
@@ -109,6 +113,7 @@ export const payments = {
   },
   forTask: (taskId: string) => db.prepare(`SELECT * FROM payments WHERE task_id = ? ORDER BY created_at`).all(taskId) as Payment[],
   all: () => db.prepare(`SELECT * FROM payments ORDER BY created_at`).all() as Payment[],
+  recent: (n = 10) => db.prepare(`SELECT p.*, t.goal FROM payments p JOIN tasks t ON t.id = p.task_id ORDER BY p.created_at DESC LIMIT ?`).all(n) as (Payment & { goal: string })[],
 };
 
 export const asks = {
