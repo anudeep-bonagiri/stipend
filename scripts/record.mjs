@@ -188,15 +188,15 @@ const segments = {
     await scrollTo(300, 900); await sleep(3000);
   },
 
-  // The public README: proof table, then the GurtOS comparison.
+  // The public README: proof table, then the table of what comes from Stipend and what from Solana.
   async readme({ page, mark, scrollTo, sleep }) {
     await page.goto("https://github.com/anudeep-bonagiri/stipend#readme", { waitUntil: "domcontentloaded" });
     await page.waitForSelector("article", { timeout: 60000 }); mark("readme");
     const y1 = await page.evaluate(() => { const h = [...document.querySelectorAll('article h2')].find(h => /Proof/.test(h.textContent)); return h ? h.getBoundingClientRect().top + window.scrollY - 90 : 0; });
     await scrollTo(y1, 1200); mark("proof"); await sleep(5000);
     await scrollTo(y1 + 320, 1500); await sleep(2500);
-    const y2 = await page.evaluate(() => { const h = [...document.querySelectorAll('article h2')].find(h => /GurtOS/.test(h.textContent)); return h ? h.getBoundingClientRect().top + window.scrollY - 90 : 0; });
-    await scrollTo(y2, 1200); mark("gurtos"); await sleep(5500);
+    const y2 = await page.evaluate(() => { const h = [...document.querySelectorAll('article h2')].find(h => /What comes from Stipend/.test(h.textContent)); return h ? h.getBoundingClientRect().top + window.scrollY - 90 : 0; });
+    await scrollTo(y2, 1200); mark("fromsolana"); await sleep(5500);
   },
 };
 

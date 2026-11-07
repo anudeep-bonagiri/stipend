@@ -1,15 +1,6 @@
 import Link from "next/link";
 
 export default function About() {
-  const rows: [string, string, string][] = [
-    ["Who holds the owner's key", "The box, in a root-only file", "Nobody but the owner. It is generated in the owner's browser and never sent"],
-    ["Budget", "Enforced by the operating system", "Enforced by the chain: the task wallet holds exactly the budget, so overspending is impossible"],
-    ["Approval", "A tap the box relays", "A signature. The owner signs the transfer; the box can only add the fee"],
-    ["Fees", "Paid by Coinbase's facilitator", "Paid by our own sponsor key. Task wallets never hold SOL. No third party"],
-    ["Audit anchor", "A daily fingerprint; recent tasks read not anchored yet", "A receipt the moment each task ends"],
-    ["Paid services", "x402 through a hosted facilitator", "x402-shaped: 402, pay, retry with the signature, the service reads the transfer from the chain itself"],
-    ["Unknown payees", "Asked about", "Refused outright. The only doors are the listed services"],
-  ];
   return (
     <div className="space-y-6">
       <section>
@@ -22,14 +13,6 @@ export default function About() {
         <p><strong>Only certain doors.</strong> The task can pay the listed services and nobody else. A payment to a stranger is refused and logged, not asked about.</p>
         <p><strong>The front desk calls you.</strong> Anything beyond the budget pauses and asks the owner, with the agent&apos;s own reason and the risk flags the broker saw.</p>
         <p><strong>Cameras in the hallway.</strong> Every payment carries a memo naming its task. The action log is hash-chained, and the last hash is written to Solana when the task ends. <Link href="/">Any task page</Link> links to a check you can run in your own browser.</p>
-      </section>
-      <section className="card">
-        <h2 className="mb-2 font-semibold">Compared with GurtOS, the Cal Hacks 13.0 Best Use of Solana winner</h2>
-        <table>
-          <thead><tr><th></th><th>GurtOS</th><th>Stipend</th></tr></thead>
-          <tbody>{rows.map(([k, a, b]) => <tr key={k}><td className="font-medium">{k}</td><td>{a}</td><td>{b}</td></tr>)}</tbody>
-        </table>
-        <p className="muted mt-2 text-xs">GurtOS is an operating system and does far more than money. Stipend is only the money layer, built in one weekend, and the comparison is about that layer.</p>
       </section>
       <section className="card space-y-2 text-sm">
         <h2 className="font-semibold">Questions judges ask</h2>
