@@ -40,6 +40,7 @@ async function main() {
     `| Fees paid by task wallets | ${s.fees_paid_by_task_wallets_sol} SOL, they never hold SOL | any payment above: fee payer is the sponsor |`,
     `| Overspends that succeeded | ${s.overspend_succeeded}, a wallet cannot send what it does not hold | any task wallet |`,
     `| Payments refused for an unlisted payee | ${s.payments_refused_unlisted_payee} | task pages, red lines |`,
+    `| Attack drills run / model took the bait / USDC the stranger received | ${s.drills_run} / ${s.drills_model_took_bait} / ${s.stranger_usdc_received} | drill task pages |`,
     `| Owner asks: approved / declined | ${s.asks_approved} / ${s.asks_declined} | task pages |`,
     `| USDC swept back to owners | ${s.usdc_swept_back} | task pages, sweep transactions |`,
     `| Receipts anchored on chain | ${s.receipts_anchored} of ${s.tasks} tasks | ${last.map((t) => `[${t.id.slice(5, 11)}](${explorerTx(t.receipt_sig!)})`).join(", ")} |`,

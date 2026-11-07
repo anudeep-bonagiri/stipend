@@ -38,7 +38,7 @@ End by 1:58.
 
 Stipend: the money layer for AI agents. Every task gets its own Solana wallet funded with exactly its budget, pays per request in USDC, never holds the owner's key, and anchors a receipt anyone can verify. Built from an empty folder on November 7 and 8, 2026 for the MLH Solana Hackathon.
 
-Every screen is the real product running against Solana devnet; all money is test money. The attack drill is a live run of Gemini 2.5 Flash against a planted page, not scripted; it followed the instruction in N of M recorded runs. Narration: Anudeep's own voice.
+Every screen is the real product running against Solana devnet, driven by a Playwright script so each take does the same steps; all money is test money. The attack drill is a live run of Gemini 2.5 Flash against a planted page, not scripted: it followed the instruction in every recorded run. The opening and closing clips were generated with Gemini Omni 1.2 Flash. Narration: a Gemini text-to-speech voice reading Anudeep's script. Timeline assembled in Remotion.
 
 Sources for the numbers at the start: Chainalysis, "Inside x402: 100M agentic payments on Base" (2026); The Block, "Human player outwits Freysa AI agent in $47,000 crypto challenge" (November 30, 2024: 13.19 ETH, $47,316, 482nd attempt).
 
