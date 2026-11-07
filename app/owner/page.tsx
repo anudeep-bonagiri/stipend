@@ -65,7 +65,7 @@ export default function OwnerPage() {
   return (
     <div className="space-y-6">
       <section>
-        <h1 className="text-2xl font-semibold">Owner</h1>
+        <h1 className="text-3xl font-semibold leading-tight">Owner</h1>
         <p className="muted mt-1 max-w-3xl">This is the phone in GurtOS&apos;s story, except the approval is a signature. Your key is generated here and never sent anywhere. Approving an ask signs a USDC transfer from this wallet into the task&apos;s wallet. The box only adds the fee.</p>
       </section>
 
@@ -88,7 +88,7 @@ export default function OwnerPage() {
       <section className="card space-y-3">
         <h2 className="font-semibold">Asks waiting for you {asks.length ? <span className="chip chip-warn ml-2">{asks.length}</span> : null}</h2>
         {asks.length === 0 ? <p className="muted text-sm">Nothing waiting. Start a task on the <Link href="/">Tasks page</Link> and it will ask for its budget here.</p> : asks.map((a) => (
-          <div key={a.id} className="rounded-lg border p-3" style={{ borderColor: a.risk.length ? "var(--warn)" : "var(--line)" }}>
+          <div key={a.id} className={`rounded-xl border p-4 ${a.risk.length ? "card-warn" : ""}`} style={{ borderColor: a.risk.length ? undefined : "var(--line)" }}>
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div className="font-medium">{usdc(a.micro)} USDC · <Link href={`/tasks/${a.task_id}`}>{a.goal}</Link></div>
               <div className="muted text-xs">task wallet <a className="mono" href={addrUrl(a.wallet_pubkey)} target="_blank" rel="noreferrer">{short(a.wallet_pubkey)}</a> · budget so far {usdc(a.budget_micro)}</div>

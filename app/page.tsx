@@ -36,14 +36,14 @@ export default function Home() {
     router.push(`/tasks/${data.task.id}`);
   }
 
-  const tile = (label: string, value: string | number | null | undefined) => (
-    <div className="card"><div className="muted text-xs">{label}</div><div className="text-2xl font-semibold">{value ?? "–"}</div></div>
+  const tile = (label: string, value: string | number | null | undefined, good = false) => (
+    <div className="stat"><div className="muted text-xs">{label}</div><div className={`n${good ? " good" : ""}`}>{value ?? "–"}</div></div>
   );
 
   return (
     <div className="space-y-6">
       <section>
-        <h1 className="text-2xl font-semibold">Every agent task gets its own wallet, its own budget, and a human who signs anything beyond it.</h1>
+        <h1 className="text-3xl font-semibold leading-tight">Every agent task gets its own wallet, its own budget, and a human who signs anything beyond it.</h1>
         <p className="muted mt-2 max-w-3xl">
           An agent on Stipend pays for its own searches and model calls in USDC from a wallet that holds exactly its budget.
           It cannot overspend, because the money is not there. It cannot pay anyone but the listed services, and it cannot touch
@@ -54,22 +54,22 @@ export default function Home() {
 
       {stats && (
         <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          {tile("payments confirmed on devnet", stats.payments_confirmed)}
+          {tile("payments confirmed on devnet", stats.payments_confirmed, true)}
           {tile("payments failed", stats.payments_failed)}
           {tile("fees paid by task wallets", `${stats.fees_paid_by_task_wallets_sol} SOL`)}
           {tile("overspends that succeeded", stats.overspend_succeeded)}
           {tile("payments refused (unlisted payee)", stats.payments_refused_unlisted_payee)}
           {tile("asks declined by the owner", stats.asks_declined)}
           {tile("USDC swept back to owners", stats.usdc_swept_back)}
-          {tile("receipts anchored on chain", stats.receipts_anchored)}
-          {tile("payment confirmed, median", stats.payment_ms_median != null ? `${stats.payment_ms_median} ms` : null)}
+          {tile("receipts anchored on chain", stats.receipts_anchored, true)}
+          {tile("payment confirmed, median", stats.payment_ms_median != null ? `${stats.payment_ms_median} ms` : null, true)}
           {tile("owner tap to confirmed, median", stats.approval_to_confirmed_ms_median != null ? `${stats.approval_to_confirmed_ms_median} ms` : null)}
         </section>
       )}
 
       <section className="card space-y-3">
         <h2 className="font-semibold">Start a task</h2>
-        {!owner && <p className="chip chip-warn">No owner key in this browser yet. <Link href="/owner">Set one up on the Owner page</Link> first.</p>}
+        {!owner && <p className="chip chip-warn" style={{ whiteSpace: "normal" }}>No owner key in this browser yet. <Link href="/owner">Set one up on the Owner page</Link> first.</p>}
         <label className="block text-sm">Goal<textarea rows={2} value={goal} onChange={(e) => setGoal(e.target.value)} /></label>
         <div className="flex flex-wrap items-end gap-4">
           <label className="text-sm">Budget (USDC)<input className="w-32" value={budget} onChange={(e) => setBudget(e.target.value)} /></label>

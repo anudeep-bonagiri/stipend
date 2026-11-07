@@ -13,7 +13,7 @@ export default function About() {
   return (
     <div className="space-y-6">
       <section>
-        <h1 className="text-2xl font-semibold">How it works</h1>
+        <h1 className="text-3xl font-semibold leading-tight">How it works</h1>
         <p className="muted mt-2 max-w-3xl">Think of petty cash. A task gets an envelope with exactly its budget, spends from it in public, and hands back what is left with a receipt. The owner keeps the safe key.</p>
       </section>
       <section className="card space-y-2 text-sm">
