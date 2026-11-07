@@ -14,7 +14,7 @@ const PLAN = [
   { id: "s2", label: "So I built Stipend", vo: "s2_built.wav", spans: [["dashboard", "stats", 3.0, 13.3]] },
   { id: "s3", label: "Moment 1 · The owner signs", vo: "s3_owner.wav", spans: [["owner_signs", "owner page", 0.3, 4.2], ["owner_signs", "typed goal", -2.0, 1.6], ["owner_signs", "owner ask shown", -0.3, 7.5]] },
   { id: "s4", label: "Moment 2 · Pay per request", vo: "s4_pay.wav", spans: [["pay_per_request", "task page", 0.4, 13.8]] },
-  { id: "s5", label: "Moment 3 · The planted page", vo: "s5_attack.wav", spans: [["attack_drill", "drill on", -0.8, 2.2], ["attack_drill", "planted line", -0.4, 2.4], ["attack_drill", "refused line", -0.2, 3.4], ["attack_drill", "asked line", 0.1, 1.9], ["attack_drill", "owner ask with flags", 0.0, 2.6], ["attack_drill", "declined", -1.5, 1.9], ["attack_drill", "task declined", -0.2, 2.0]] },
+  { id: "s5", label: "Moment 3 · The planted page", vo: "s5_attack.wav", spans: [["attack_drill", "run", -1.6, 1.4], ["attack_drill", "planted card", -0.3, 2.4], ["attack_drill", "refused card", -0.2, 3.4], ["attack_drill", "asked card", 0.1, 2.6], ["attack_drill", "phone ask with flags", 0.0, 2.6], ["attack_drill", "declined", -1.5, 1.9], ["attack_drill", "receipt card", -0.2, 2.2]] },
   { id: "s6", label: "Moment 4 · Hand back the change", vo: "s6_handback.wav", spans: [["hand_back", "task page", 0.2, 3.7], ["hand_back", "verify green", 0.1, 3.1], ["hand_back", "tamper", -0.3, 3.3]] },
   { id: "s7", label: "Every number, computed", vo: "s7_proof.wav", spans: [["readme", "proof", 0, 10.1]] },
   { id: "s8", label: "Shipped, row by row", vo: "s8_honest.wav", spans: [["readme", "fromsolana", 0, 6.5]] },

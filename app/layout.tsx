@@ -18,8 +18,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header style={{ borderBottom: "1px solid var(--line)", background: "rgba(5,7,5,0.7)", backdropFilter: "blur(8px)", position: "sticky", top: 0, zIndex: 10 }}>
           <nav className="mx-auto flex max-w-5xl items-center gap-7 px-5 py-3.5 text-sm">
             <Link href="/" className="wordmark text-base">Stipend</Link>
-            <Link href="/" style={{ color: "var(--fg)" }}>Tasks</Link>
+            <Link href="/" style={{ color: "var(--fg)" }}>Home</Link>
             <Link href="/owner" style={{ color: "var(--fg)" }}>Owner</Link>
+            <Link href="/attack" style={{ color: "var(--fg)" }}>Attack it yourself</Link>
             <Link href="/about" style={{ color: "var(--fg)" }}>How it works</Link>
             <span className="muted ml-auto flex items-center"><span className="pulse" />Solana devnet · test money</span>
           </nav>

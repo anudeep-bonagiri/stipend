@@ -16,7 +16,8 @@ export async function POST(req: Request) {
   if (!goal) return Response.json({ error: "goal required" }, { status: 400 });
   if (!(budget > 0 && budget <= 5)) return Response.json({ error: "budget must be between 0 and 5 USDC" }, { status: 400 });
   if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(owner)) return Response.json({ error: "ownerPubkey required" }, { status: 400 });
-  const { task, ask } = createTask(goal, toMicro(budget), owner, !!body.injection);
+  const planted = typeof body.planted === "string" && body.planted.trim() ? body.planted.trim().slice(0, 1500) : null;
+  const { task, ask } = createTask(goal, toMicro(budget), owner, !!body.injection || !!planted, planted);
   const { wallet_secret: _s, ...safe } = task;
   return Response.json({ task: safe, ask });
 }

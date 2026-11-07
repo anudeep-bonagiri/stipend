@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { addrUrl, txUrl, short, usdc, when } from "@/lib/client/format";
 import { StatusChip } from "@/components/StatusChip";
+import { BudgetBar } from "@/components/BudgetBar";
+import { DefenceCard, defenceCards, Ev } from "@/components/Defence";
+import { QR } from "@/components/QR";
 
 type Payment = { id: string; service: string; destination: string; micro: number; sig: string | null; status: string; ms: number | null; created_at: number };
-type Ev = { seq: number; ts: number; type: string; data: string; hash: string };
 type Task = { id: string; goal: string; status: string; budget_micro: number; owner_pubkey: string; wallet_pubkey: string; injection: number; answer: string | null; funded_sig: string | null; sweep_sig: string | null; swept_micro: number | null; receipt_sig: string | null; receipt_hash: string | null };
 type Data = { task: Task; balance_usdc: number | null; payments: Payment[]; events: Ev[] };
 
@@ -43,22 +45,35 @@ function TaskPageInner() {
   if (!data) return <p className="muted">Loading…</p>;
   const { task, payments, events, balance_usdc } = data;
   const spent = payments.filter((p) => p.status === "confirmed").reduce((s, p) => s + p.micro, 0);
+  const cards = task.injection ? defenceCards(events, task.id) : [];
+  const live = ["funded", "running"].includes(task.status);
   return (
     <div className="space-y-6">
       <section>
-        <div className="flex flex-wrap items-center gap-3"><h1 className="text-2xl font-semibold leading-tight">{task.goal}</h1><StatusChip status={task.status} />{task.injection ? <span className="chip chip-warn">attack drill</span> : null}</div>
+        <div className="flex flex-wrap items-center gap-3">{live && <span className="pulse" />}<h1 className="text-2xl font-semibold leading-tight">{task.goal}</h1><StatusChip status={task.status} />{task.injection ? <span className="chip chip-warn">attack drill</span> : null}</div>
         <div className="muted mt-2 flex flex-wrap gap-x-6 gap-y-1 text-sm">
-          <span>budget {usdc(task.budget_micro)} USDC</span>
-          <span>spent {usdc(spent)} USDC</span>
-          <span>wallet holds {balance_usdc ?? "–"} USDC</span>
           <span>task wallet <a className="mono" href={addrUrl(task.wallet_pubkey)} target="_blank" rel="noreferrer">{short(task.wallet_pubkey)}</a></span>
           <span>owner <a className="mono" href={addrUrl(task.owner_pubkey)} target="_blank" rel="noreferrer">{short(task.owner_pubkey)}</a></span>
+          <span>started {when(events[0]?.ts ?? Date.now())}</span>
         </div>
+      </section>
+
+      <section className="card">
+        <div className="flex items-baseline justify-between"><h2 className="font-semibold">The envelope</h2><span className="muted text-xs">the wallet holds {balance_usdc ?? "–"} USDC right now</span></div>
+        <div className="mt-3"><BudgetBar budget={task.budget_micro} spent={spent} swept={task.swept_micro} holding={balance_usdc != null ? Math.round(balance_usdc * 1e6) : null} /></div>
+        <p className="muted mt-3 text-xs">A task can only spend what is in its wallet. Fees for every payment were paid by the sponsor; this wallet never held SOL.</p>
       </section>
 
       {(task.status === "created" || task.status === "waiting_owner") && (
         <section className="card card-warn">
           <strong>Waiting for the owner.</strong> The task cannot spend what it does not hold. <Link href="/owner">Decide on the Owner page</Link>.
+        </section>
+      )}
+
+      {cards.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="font-semibold">What stopped it</h2>
+          {cards.map((c) => <DefenceCard key={c.key} c={c} />)}
         </section>
       )}
 
@@ -72,12 +87,22 @@ function TaskPageInner() {
           <table>
             <thead><tr><th>Time</th><th>Service</th><th>USDC</th><th>Confirmed in</th><th>On chain</th></tr></thead>
             <tbody>{payments.map((p) => (
-              <tr key={p.id}><td>{when(p.created_at)}</td><td>{p.service}</td><td>{usdc(p.micro)}</td><td>{p.ms != null ? `${p.ms} ms` : "–"}</td><td>{p.sig ? <a href={txUrl(p.sig)} target="_blank" rel="noreferrer">{short(p.sig, 6)}</a> : p.status}</td></tr>
+              <tr key={p.id}><td className="whitespace-nowrap">{when(p.created_at)}</td><td><span className="sv">{p.service}</span></td><td>{usdc(p.micro)}</td><td>{p.ms != null ? <span className="flex items-center gap-2"><span className="bar" style={{ width: Math.min(120, p.ms / 12) }} />{p.ms} ms</span> : "–"}</td><td>{p.sig ? <a href={txUrl(p.sig)} target="_blank" rel="noreferrer">{short(p.sig, 6)} ↗</a> : p.status}</td></tr>
             ))}</tbody>
           </table>
         )}
-        <p className="muted mt-2 text-xs">Fees for every one of these were paid by the sponsor. The task wallet never held SOL.</p>
       </section>
+
+      {task.receipt_sig && (
+        <section className="card flex flex-wrap items-center gap-5">
+          <QR text={txUrl(task.receipt_sig)} />
+          <div className="space-y-1 text-sm">
+            <div className="font-semibold">Receipt anchored on Solana</div>
+            <div className="muted">Memo <span className="mono">stipend:v1:{task.id}:…:{(task.receipt_hash ?? "").slice(0, 12)}…</span></div>
+            <div className="flex gap-3"><a className="btn" href={txUrl(task.receipt_sig)} target="_blank" rel="noreferrer">Open on Explorer</a><Link className="btn btn-primary" href={`/verify/${task.id}`}>Check it in your browser</Link></div>
+          </div>
+        </section>
+      )}
 
       <section className="card">
         <h2 className="mb-2 font-semibold">Action log <span className="muted text-xs">hash-chained; the receipt at the end is written to Solana</span></h2>
@@ -88,9 +113,6 @@ function TaskPageInner() {
             </li>
           ); })}
         </ol>
-        {task.receipt_sig && (
-          <p className="mt-3 text-sm">Receipt: <a href={txUrl(task.receipt_sig)} target="_blank" rel="noreferrer">memo on devnet</a> · <Link href={`/verify/${task.id}`}>check it in your browser</Link></p>
-        )}
       </section>
     </div>
   );
