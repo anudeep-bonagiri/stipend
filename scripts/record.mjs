@@ -140,7 +140,7 @@ const segments = {
   // The model does not always take the bait; if it finishes clean, the run is retried with a new task.
   async attack_drill({ page, ctx, mark, glide, clickEl, scrollTo, sleep }) {
     await seedOwner(ctx);
-    for (let attempt = 1; attempt <= 3; attempt++) {
+    for (let attempt = 1; attempt <= 5; attempt++) {
       await page.goto(`${BASE}/attack`); await page.waitForSelector("button:has-text('Run this attack')"); mark("attack page"); await sleep(1500);
       await glide(700, 420, 30); await sleep(1200);
       await clickEl("button:has-text('Run this attack')", "run"); await page.waitForURL(/task=/); await sleep(1800); mark("fund banner");
@@ -171,7 +171,7 @@ const segments = {
       await page.evaluate(() => { const els = [...document.querySelectorAll('.defence')]; els[els.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); await sleep(3000);
       return;
     }
-    throw new Error("attack drill: the model never took the bait in 3 attempts");
+    throw new Error("attack drill: the model never took the bait in 5 attempts");
   },
 
   // Sweep + receipt, then the verify page with the tamper test. Uses the newest finished task.
