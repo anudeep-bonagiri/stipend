@@ -46,7 +46,7 @@ function TaskPageInner() {
   return (
     <div className="space-y-6">
       <section>
-        <div className="flex flex-wrap items-center gap-3"><h1 className="text-xl font-semibold">{task.goal}</h1><StatusChip status={task.status} />{task.injection ? <span className="chip chip-warn">attack drill</span> : null}</div>
+        <div className="flex flex-wrap items-center gap-3"><h1 className="text-2xl font-semibold leading-tight">{task.goal}</h1><StatusChip status={task.status} />{task.injection ? <span className="chip chip-warn">attack drill</span> : null}</div>
         <div className="muted mt-2 flex flex-wrap gap-x-6 gap-y-1 text-sm">
           <span>budget {usdc(task.budget_micro)} USDC</span>
           <span>spent {usdc(spent)} USDC</span>
@@ -57,7 +57,7 @@ function TaskPageInner() {
       </section>
 
       {(task.status === "created" || task.status === "waiting_owner") && (
-        <section className="card" style={{ borderColor: "var(--warn)" }}>
+        <section className="card card-warn">
           <strong>Waiting for the owner.</strong> The task cannot spend what it does not hold. <Link href="/owner">Decide on the Owner page</Link>.
         </section>
       )}
@@ -81,9 +81,9 @@ function TaskPageInner() {
 
       <section className="card">
         <h2 className="mb-2 font-semibold">Action log <span className="muted text-xs">hash-chained; the receipt at the end is written to Solana</span></h2>
-        <ol className="space-y-1 text-sm">
+        <ol className="log space-y-1.5 text-sm">
           {events.map((e) => { const d = describe(e, task.id); return (
-            <li key={e.seq} className="flex gap-3" style={{ color: d.tone === "warn" ? "var(--warn)" : d.tone === "ok" ? "var(--ok)" : undefined }}>
+            <li key={e.seq} className={`flex gap-3 ${d.tone ?? ""}`}>
               <span className="muted w-20 shrink-0">{when(e.ts)}</span><span>{d.text}</span>
             </li>
           ); })}

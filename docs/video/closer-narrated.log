@@ -1,0 +1,1 @@
+closer-narrated done in 62 s, 6.2 MB, status completed usage {"total_tokens":70497,"total_input_tokens":253,"input_tokens_by_modality":[{"modality":"text","tokens":253}],"total_cached_tokens":0,"total_output_tokens":69504,"output_tokens_by_modality":[{"modality":"video","tokens":69504}],"total_tool_use_tokens":0,"total_thought_tokens":740,"initial_input_tokens":253}
