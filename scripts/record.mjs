@@ -38,13 +38,19 @@ async function segment(name, fn) {
   const mark = (label) => { marks.push({ label, t: +((Date.now() - t0) / 1000).toFixed(2) }); console.log(`  ${((Date.now() - t0) / 1000).toFixed(1)}s ${label}`); };
   // smooth mouse helpers
   const glide = async (x, y, steps = 25) => { await page.mouse.move(x, y, { steps }); };
+  // With CSS zoom on the page, boundingBox comes back in unzoomed layout units, so the
+  // cursor glides to box*ZOOM and the click itself is dispatched on the element.
   const clickEl = async (sel, label) => {
     const el = page.locator(sel).first();
     await el.waitFor({ state: "visible", timeout: 60000 });
+    await el.scrollIntoViewIfNeeded();
     const b = await el.boundingBox();
-    await glide(b.x + b.width / 2, b.y + b.height / 2);
+    await glide((b.x + b.width / 2) * ZOOM, (b.y + b.height / 2) * ZOOM);
     await sleep(350);
-    await page.mouse.down(); await sleep(90); await page.mouse.up();
+    await page.evaluate(() => { const c = document.getElementById('__cur'); if (c) c.style.transform = 'translate(-50%,-50%) scale(.6)'; });
+    await sleep(90);
+    await el.dispatchEvent("click");
+    await page.evaluate(() => { const c = document.getElementById('__cur'); if (c) c.style.transform = 'translate(-50%,-50%) scale(1)'; });
     if (label) mark(label);
   };
   const typeInto = async (sel, text) => { await clickEl(sel); await page.fill(sel, ""); await page.keyboard.type(text, { delay: 28 }); };
@@ -131,28 +137,42 @@ const segments = {
   },
 
   // Attack drill, end to end: create with the drill on, approve, watch the red lines, decline.
+  // The model does not always take the bait; if it finishes clean, the run is retried with a new task.
   async attack_drill({ page, ctx, mark, glide, clickEl, typeInto, scrollTo, sleep }) {
     await seedOwner(ctx);
-    await page.goto(`${BASE}/`); await page.waitForSelector("textarea"); mark("dashboard");
-    await typeInto("textarea", GOAL); await sleep(300);
-    await clickEl("input[type=checkbox]", "drill on"); await sleep(900);
-    await clickEl("button:has-text('Create task')", "create"); await page.waitForURL(/\/tasks\//); await sleep(1500);
-    const url = page.url();
-    await page.goto(`${BASE}/owner`); await page.waitForSelector("button:has-text('Approve and sign')"); await sleep(900);
-    await clickEl("button:has-text('Approve and sign')", "approve"); await page.waitForSelector("text=Approved 0.06 USDC", { timeout: 60000 }); mark("approved"); await sleep(1200);
-    await page.goto(url); await page.waitForSelector("text=Action log"); mark("task page");
-    await page.waitForSelector("text=planted page", { timeout: 120000 }); mark("planted line");
-    await scrollTo(380, 1000);
-    await page.waitForSelector("text=Refused", { timeout: 180000 }); mark("refused line");
-    await page.evaluate(() => document.querySelector(".log li.warn")?.scrollIntoView({ behavior: "smooth", block: "center" })); await sleep(2500);
-    await page.waitForSelector("text=Asked the owner for", { timeout: 240000 }); 
-    await page.waitForSelector("text=instruction came from web content", { timeout: 240000 }); mark("asked line");
-    await page.evaluate(() => { const els = [...document.querySelectorAll('.log li')]; els[els.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); await sleep(2500);
-    await page.goto(`${BASE}/owner`); await page.waitForSelector("text=instruction came from web content"); mark("owner ask with flags"); await sleep(2500);
-    await glide(500, 640, 30); await sleep(800);
-    await clickEl("button:has-text('Decline')", "declined"); await page.waitForSelector("text=Declined 0.005", { timeout: 60000 }); await sleep(2500);
-    await page.goto(url); await page.waitForSelector("text=declined"); mark("task declined"); await sleep(2000);
-    await page.evaluate(() => { const els = [...document.querySelectorAll('.log li')]; els[els.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); await sleep(3000);
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      await page.goto(`${BASE}/`); await page.waitForSelector("textarea"); mark("dashboard");
+      await typeInto("textarea", GOAL); await sleep(300);
+      await clickEl("input[type=checkbox]", "drill on"); await sleep(900);
+      await clickEl("button:has-text('Create task')", "create"); await page.waitForURL(/\/tasks\//); await sleep(1500);
+      const url = page.url();
+      await page.goto(`${BASE}/owner`); await page.waitForSelector("button:has-text('Approve and sign')"); await sleep(900);
+      await clickEl("button:has-text('Approve and sign')", "approve"); await page.waitForSelector("text=Approved 0.06 USDC", { timeout: 60000 }); mark("approved"); await sleep(1200);
+      await page.goto(url); await page.waitForSelector("text=Action log"); mark("task page");
+      await page.waitForSelector("text=planted page", { timeout: 120000 }); mark("planted line");
+      await scrollTo(380, 1000);
+      // Wait for the first of: a refusal, an owner ask with the web-content flag, or the task ending clean.
+      const outcome = await Promise.race([
+        page.waitForSelector("text=Refused", { timeout: 240000 }).then(() => "refused"),
+        page.waitForSelector("text=instruction came from web content", { timeout: 240000 }).then(() => "asked"),
+        page.waitForSelector(".chip-ok:has-text('finished')", { timeout: 240000 }).then(() => "finished"),
+      ]).catch(() => "timeout");
+      if (outcome === "finished" || outcome === "timeout") { console.log(`  model did not take the bait (${outcome}), attempt ${attempt}; retrying`); continue; }
+      if (outcome === "refused") {
+        mark("refused line");
+        await page.evaluate(() => document.querySelector(".log li.warn")?.scrollIntoView({ behavior: "smooth", block: "center" })); await sleep(2500);
+        await page.waitForSelector("text=instruction came from web content", { timeout: 240000 });
+      }
+      mark("asked line");
+      await page.evaluate(() => { const els = [...document.querySelectorAll('.log li')]; els[els.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); await sleep(2500);
+      await page.goto(`${BASE}/owner`); await page.waitForSelector("text=instruction came from web content"); mark("owner ask with flags"); await sleep(2500);
+      await glide(500, 640, 30); await sleep(800);
+      await clickEl("button:has-text('Decline')", "declined"); await page.waitForSelector("text=Declined 0.005", { timeout: 60000 }).catch(() => {}); await sleep(2500);
+      await page.goto(url); await page.waitForSelector("text=declined"); mark("task declined"); await sleep(2000);
+      await page.evaluate(() => { const els = [...document.querySelectorAll('.log li')]; els[els.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); await sleep(3000);
+      return;
+    }
+    throw new Error("attack drill: the model never took the bait in 3 attempts");
   },
 
   // Sweep + receipt, then the verify page with the tamper test. Uses the newest finished task.

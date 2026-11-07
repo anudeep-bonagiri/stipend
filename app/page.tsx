@@ -59,6 +59,7 @@ export default function Home() {
           {tile("fees paid by task wallets", `${stats.fees_paid_by_task_wallets_sol} SOL`)}
           {tile("overspends that succeeded", stats.overspend_succeeded)}
           {tile("payments refused (unlisted payee)", stats.payments_refused_unlisted_payee)}
+          {tile("attack drills: took the bait / stranger paid", stats.drills_run != null ? `${stats.drills_model_took_bait} of ${stats.drills_run} / ${stats.stranger_usdc_received}` : null)}
           {tile("asks declined by the owner", stats.asks_declined)}
           {tile("USDC swept back to owners", stats.usdc_swept_back)}
           {tile("receipts anchored on chain", stats.receipts_anchored, true)}
