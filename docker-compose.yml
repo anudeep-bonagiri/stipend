@@ -1,0 +1,12 @@
+services:
+  stipend:
+    build: .
+    restart: unless-stopped
+    env_file: .env.local
+    environment:
+      - STIPEND_BASE_URL=http://localhost:3000
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - ./.keys:/app/.keys
+      - ./data:/app/data
