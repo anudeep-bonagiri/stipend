@@ -1,0 +1,1 @@
+opener-silent done in 75 s, 7.6 MB, status completed usage {"total_tokens":87936,"total_input_tokens":274,"input_tokens_by_modality":[{"modality":"text","tokens":274}],"total_cached_tokens":0,"total_output_tokens":86880,"output_tokens_by_modality":[{"modality":"video","tokens":86880}],"total_tool_use_tokens":0,"total_thought_tokens":782,"initial_input_tokens":274}
