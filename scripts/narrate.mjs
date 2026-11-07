@@ -6,7 +6,9 @@ const KEY = env.VERTEX_API_KEY;
 const voice = process.argv[2] ?? "Charon";
 const model = process.argv[3] ?? "gemini-2.5-flash-preview-tts";
 const { style, lines } = JSON.parse(fs.readFileSync("docs/video/narration.json", "utf8"));
+const only = (process.env.ONLY ?? "").split(",").filter(Boolean);
 for (const [id, text] of Object.entries(lines)) {
+  if (only.length && !only.includes(id)) continue;
   const body = {
     contents: [{ role: "user", parts: [{ text: `${style}\n\n${text}` }] }],
     generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } } },
