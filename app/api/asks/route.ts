@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { asks, tasks } from "@/lib/db";
 
 export async function GET(req: Request) {

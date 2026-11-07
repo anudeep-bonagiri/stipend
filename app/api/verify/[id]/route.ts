@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { events, tasks } from "@/lib/db";
 
 /** Everything a browser needs to re-check a task's receipt on its own. */

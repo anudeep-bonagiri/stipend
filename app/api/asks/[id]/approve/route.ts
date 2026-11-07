@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { runTask } from "@/lib/agent";
 import { approveAsk } from "@/lib/broker";
 import { asks } from "@/lib/db";
