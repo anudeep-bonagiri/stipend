@@ -51,23 +51,24 @@ GurtOS won Best Use of Solana at Cal Hacks 13.0 two weeks ago with an operating 
 GurtOS does far more than money. This comparison is about the money layer only.
 
 <!-- facts:start -->
-## Proof (generated 2026-11-07 18:14 UTC by scripts/facts.ts)
+## Proof (generated 2026-11-07 19:54 UTC by scripts/facts.ts)
 
 | Number | Value | Where to check |
 |---|---|---|
-| Transactions the sponsor paid fees for, on devnet | 46 (0 failed) | [sponsor wallet](https://explorer.solana.com/address/DX7jAZax87KtAiSEv85ArXViU8heEjkf9CRUMiMZU6zC?cluster=devnet) |
-| Transactions that paid the services wallet | 27 (0 failed) | [services wallet](https://explorer.solana.com/address/DL7YweYxDerw3BgpmBG9PpePZC8VfwncpC2fo7CL4uXf?cluster=devnet) |
-| Agent payments confirmed | 27 (0 failed), 0.18 USDC in total | [one of them](https://explorer.solana.com/tx/YY28x3JH4uCShY9yBrqAW2YtdXo2trUQSeyviMLpUTGuVbYPWpFyZ6Nau6TRYs9V5gMV6g9Uw4wVJLbXTHHmeLf?cluster=devnet) |
+| Transactions the sponsor paid fees for, on devnet | 104 (0 failed) | [sponsor wallet](https://explorer.solana.com/address/DX7jAZax87KtAiSEv85ArXViU8heEjkf9CRUMiMZU6zC?cluster=devnet) |
+| Transactions that paid the services wallet | 65 (0 failed) | [services wallet](https://explorer.solana.com/address/DL7YweYxDerw3BgpmBG9PpePZC8VfwncpC2fo7CL4uXf?cluster=devnet) |
+| Agent payments confirmed | 65 (0 failed), 0.43 USDC in total | [one of them](https://explorer.solana.com/tx/2tF7d5VNu5TQCDpgHXK4gto4br7CkNkpZLxtmRCtGnqTq45MjkTANXd7jQWJrwcqEqdF4GjCDTz8hapVH9quNhuH?cluster=devnet) |
 | Fees paid by task wallets | 0 SOL, they never hold SOL | any payment above: fee payer is the sponsor |
 | Overspends that succeeded | 0, a wallet cannot send what it does not hold | any task wallet |
-| Payments refused for an unlisted payee | 3 | task pages, red lines |
-| Owner asks: approved / declined | 4 / 2 | task pages |
-| USDC swept back to owners | 0.06 | task pages, sweep transactions |
-| Receipts anchored on chain | 4 of 4 tasks | [f8e991](https://explorer.solana.com/tx/5PJsYYiDumYwVChhxtx3wK2YE3Xp2ksWp1RxQcQNTTNRkcgi1P9TBZuFmfiFVaucwmpLu1ggBKpmyRZTwytxdDVD?cluster=devnet), [da323a](https://explorer.solana.com/tx/4xsHE3xW5Vwwda9ofncTi6nh3hfqTXBqpe79xS7U62XXfbApyoYQXDK7Via9ourW6S3FaJpS1pyBjeEqqhzEJBLx?cluster=devnet), [8950bc](https://explorer.solana.com/tx/iQHQrSyK4DHfTkfGihQpP16bovxdYvLHUvohUZGs5fn97tAhtaQ66jE76tL5ePdeNabFpBRJ4y3xU7Q4VZFy9yU?cluster=devnet) |
-| Hash-chained log entries | 85 | /verify/<task> recomputes them in your browser |
-| Payment confirmed, median | 804 ms | task pages, "confirmed in" column |
-| Owner signature to confirmed funding, median | 922 ms | owner.approved log lines |
-| Sponsor SOL left | 9.994 | [sponsor wallet](https://explorer.solana.com/address/DX7jAZax87KtAiSEv85ArXViU8heEjkf9CRUMiMZU6zC?cluster=devnet) |
+| Payments refused for an unlisted payee | 5 | task pages, red lines |
+| Attack drills run / model took the bait / USDC the stranger received | 6 / 4 / 0 | drill task pages |
+| Owner asks: approved / declined | 10 / 4 | task pages |
+| USDC swept back to owners | 0.17 | task pages, sweep transactions |
+| Receipts anchored on chain | 10 of 10 tasks | [fb1428](https://explorer.solana.com/tx/ZhFpy8MQD2zCzLQWnTJ1ys4Z6j5Vhc288cqx4cRAFtmiJdVyhRbEMq3y1MHrGr5vJyhHDmzq4ZxnT8VpPxqKxYU?cluster=devnet), [8f9267](https://explorer.solana.com/tx/2CzZY517vtKNXRwc3ECag6DReA8c98zgHua2jodN3LkEsnBnSYXzXmTnfTmzjiSfJQ747tHiguETNztzm9voGuiW?cluster=devnet), [201694](https://explorer.solana.com/tx/5nuqvxKWu7LS5xXeFCzCEiPmNyXermGTmz4Ec55bfcXAxmttjj8HMrqYxAkX9Z14shCAydv6cfVpwPhmCVMAHmDJ?cluster=devnet) |
+| Hash-chained log entries | 203 | /verify/<task> recomputes them in your browser |
+| Payment confirmed, median | 835 ms | task pages, "confirmed in" column |
+| Owner signature to confirmed funding, median | 884 ms | owner.approved log lines |
+| Sponsor SOL left | 9.992 | [sponsor wallet](https://explorer.solana.com/address/DX7jAZax87KtAiSEv85ArXViU8heEjkf9CRUMiMZU6zC?cluster=devnet) |
 
 Mint: [C9ZHo6VUmfCnGVXBAtJEgAicFHMmXJ3Pf5zxyKdkPLKu](https://explorer.solana.com/address/C9ZHo6VUmfCnGVXBAtJEgAicFHMmXJ3Pf5zxyKdkPLKu?cluster=devnet) (our own devnet test mint, 6 decimals; test money).
 <!-- facts:end -->
