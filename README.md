@@ -50,22 +50,6 @@ AI agents now pay for things: searches, model calls, data, compute. Today that m
 | Which work paid for what | A log the box can edit | A memo on every payment, a receipt on chain per task |
 | Unknown payees | Policy says no, if policy runs | Refused by the only code that holds the task key |
 
-## Compared with GurtOS
-
-GurtOS won Best Use of Solana at Cal Hacks 13.0 two weeks ago with an operating system for agents. We studied its submission closely and kept what worked: per-task isolation, approval before spending, a hash-chained log anchored on chain, measured proof with explorer links, and a plain account of limits. Then we fixed the money layer.
-
-| | GurtOS | Stipend |
-|---|---|---|
-| Who holds the owner's key | The box, in a root-only file. A fully taken-over box can spend | Nobody but the owner. The box only ever holds task wallets |
-| Budget | Enforced by the OS | Enforced by the chain: the task wallet holds exactly the budget |
-| Approval | A tap the box relays | A signature. The owner signs the transfer; the box can only add the fee |
-| Fees | Paid by Coinbase's facilitator | Paid by our own sponsor key. No third party |
-| Audit anchor | A daily fingerprint; recent tasks read "not anchored yet" | A receipt the moment each task ends |
-| Paid services | x402 through a hosted facilitator | x402-shaped flow we host: 402, pay, retry with the signature, the service reads the transfer from the chain itself |
-| Unknown payees | Asked about | Refused outright |
-
-GurtOS does far more than money. This comparison is about the money layer only.
-
 <!-- facts:start -->
 ## Proof (generated 2026-11-07 19:54 UTC by scripts/facts.ts)
 
@@ -130,7 +114,7 @@ Turn on "attack drill" when starting a task and the first search's results inclu
 
 ## Rules, honestly
 
-All code in this repository was written during the hackathon (November 7 and 8, 2026). The idea has lineage we want to name: the "pause and ask a person you trust" idea comes from our earlier anti-scam project Lookout, and the "approve before an agent spends, anchor the log on chain" idea comes from GurtOS. No code was reused from either. AI coding tools: Claude Code running Claude Fable 5.1 wrote most of the code with us directing, reviewing, and testing on devnet. APIs the product calls: Gemini 2.5 Flash and Tavily.
+All code in this repository was written during the hackathon (November 7 and 8, 2026). The "pause and ask a person you trust" idea comes from our earlier anti-scam project Lookout; no code was reused from it. AI coding tools: Claude Code running Claude Fable 5.1 wrote most of the code with us directing, reviewing, and testing on devnet. APIs the product calls: Gemini 2.5 Flash and Tavily.
 
 ## Run it locally
 

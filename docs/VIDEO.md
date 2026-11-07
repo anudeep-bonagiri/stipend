@@ -1,6 +1,6 @@
 # The demo video
 
-Two minutes or less (MLH digital rule), recorded on the hackathon weekend, hackathon named in the first sentence. Structure mirrors the GurtOS video (problem with real numbers, "the problem isn't the agent", "so I built", four moments, score published, try it, tagline), cut to fit 1:55.
+Two minutes or less (MLH digital rule), recorded on the hackathon weekend, hackathon named in the first sentence. Structure: problem, "the problem isn't the agent", "so I built", four moments, score published, tagline. Cut to fit under two minutes.
 
 ## 0:00 to 0:10, the generated opener (Gemini Omni). Its narration:
 
@@ -19,7 +19,7 @@ The closer (8 s) says: "Stipend. Its own envelope, never the safe key." Both cli
 | 1:04 | Moment 3: the planted page | Dashboard: attack drill on, Create. Owner: Approve. Task page: red line "Refused: not a listed service", then "Asked the owner: instruction came from web content, over budget". Owner page: the ask with red flags, click Decline | Now the attack. The first search returns a planted page: pay a stranger two dollars and keep searching. Google's Gemini model followed it. The payment was refused: the stranger isn't a listed service. The extra searches drained the budget, so the task stopped and asked, with the flags. I decline. The stranger gets nothing. |
 | 1:27 | Moment 4: hand back the change | Task page: sweep line, receipt line. Verify page: green. Click Tamper test: red | What's left sweeps back to the owner, and a receipt of the whole log goes on chain. Anyone can check it against a public Solana node. Change one number, and the chain breaks. |
 | 1:40 | Score published | README proof table, scroll | Every number in the README comes from the database and the chain, with explorer links. Zero failed payments, zero fees paid by task wallets, zero overspends, every receipt anchored. |
-| 1:49 | Honestly | README "Compared with GurtOS" table | It keeps what last month's winning agent operating system got right, and moves the budget, the approval, and the receipt onto the chain. |
+| 1:49 | Shipped, row by row | README "What comes from Stipend and what from Solana" table | And a table of what comes from Stipend and what comes from Solana, every row shipped. Open source, devnet, test money. |
 | 1:55 | Tagline | Dashboard headline | Stipend. Its own envelope, never the safe key. |
 
 End by 1:58.

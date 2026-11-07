@@ -17,7 +17,7 @@ const PLAN = [
   { id: "s5", label: "Moment 3 · The planted page", vo: "s5_attack.wav", spans: [["attack_drill", "drill on", -0.8, 2.2], ["attack_drill", "planted line", -0.4, 2.4], ["attack_drill", "refused line", -0.2, 3.4], ["attack_drill", "asked line", 0.1, 1.9], ["attack_drill", "owner ask with flags", 0.0, 2.6], ["attack_drill", "declined", -1.5, 1.9], ["attack_drill", "task declined", -0.2, 2.0]] },
   { id: "s6", label: "Moment 4 · Hand back the change", vo: "s6_handback.wav", spans: [["hand_back", "task page", 0.2, 3.7], ["hand_back", "verify green", 0.1, 3.1], ["hand_back", "tamper", -0.3, 3.3]] },
   { id: "s7", label: "Every number, computed", vo: "s7_proof.wav", spans: [["readme", "proof", 0, 10.1]] },
-  { id: "s8", label: "Built on what won", vo: "s8_honest.wav", spans: [["readme", "gurtos", 0, 5.5]] },
+  { id: "s8", label: "Shipped, row by row", vo: "s8_honest.wav", spans: [["readme", "fromsolana", 0, 6.5]] },
 ];
 
 const out = [];

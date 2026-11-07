@@ -66,7 +66,7 @@ export default function OwnerPage() {
     <div className="space-y-6">
       <section>
         <h1 className="text-3xl font-semibold leading-tight">Owner</h1>
-        <p className="muted mt-1 max-w-3xl">This is the phone in GurtOS&apos;s story, except the approval is a signature. Your key is generated here and never sent anywhere. Approving an ask signs a USDC transfer from this wallet into the task&apos;s wallet. The box only adds the fee.</p>
+        <p className="muted mt-1 max-w-3xl">Approvals happen here, and each one is a signature. Your key is generated here and never sent anywhere. Approving an ask signs a USDC transfer from this wallet into the task&apos;s wallet. The box only adds the fee.</p>
       </section>
 
       <section className="card space-y-3">
