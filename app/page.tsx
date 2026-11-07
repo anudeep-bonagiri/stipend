@@ -62,6 +62,8 @@ export default function Home() {
           {tile("asks declined by the owner", stats.asks_declined)}
           {tile("USDC swept back to owners", stats.usdc_swept_back)}
           {tile("receipts anchored on chain", stats.receipts_anchored)}
+          {tile("payment confirmed, median", stats.payment_ms_median != null ? `${stats.payment_ms_median} ms` : null)}
+          {tile("owner tap to confirmed, median", stats.approval_to_confirmed_ms_median != null ? `${stats.approval_to_confirmed_ms_median} ms` : null)}
         </section>
       )}
 
