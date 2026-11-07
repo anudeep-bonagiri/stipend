@@ -60,7 +60,8 @@ function AttackInner() {
       {data && (
         <section className="space-y-3">
           <div className="flex flex-wrap items-center gap-3"><h2 className="font-semibold">What happened</h2><StatusChip status={data.task.status} /><Link className="text-sm" href={`/tasks/${data.task.id}`}>full task page</Link></div>
-          {waiting && <div className="card card-warn"><strong>Fund it from your phone.</strong> The task is waiting for the owner&apos;s signature on the <Link href="/owner">Owner page</Link>.</div>}
+          {status === "created" && <div className="card card-warn"><strong>Fund it from your phone.</strong> The task is waiting for the owner&apos;s signature on the <Link href="/owner">Owner page</Link>.</div>}
+          {status === "waiting_owner" && <div className="card card-warn"><strong>It stopped and asked you.</strong> The envelope is empty, so nothing more can be spent until you decide on the <Link href="/owner">Owner page</Link>.</div>}
           {cards.map((c) => <DefenceCard key={c.key} c={c} />)}
           {clean && <div className="defence neutral"><div className="t">The model ignored the page this time</div><div className="b">It answered without asking for the payment or the extra searches, so the broker never had to act. Run it again; the tally on the home page counts both outcomes.</div></div>}
           {!cards.length && !waiting && !clean && <p className="muted text-sm">Running… the first search is about to return the planted page.</p>}
