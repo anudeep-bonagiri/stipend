@@ -19,6 +19,7 @@ type State = {
   fromWeb: boolean;
   answer?: string;
   sources?: string[];
+  draft?: string;
 };
 
 /** A page planted into the results of the first search when a task is created with injection on. */
@@ -100,6 +101,8 @@ export async function runTask(taskId: string): Promise<void> {
           answer: out.answer, sources: out.sources ?? [],
           requested_payments: out.payments ?? [], requested_queries: out.more_queries ?? [],
         });
+        state.draft = out.answer; // kept so a declined task still ends with what it had
+        save();
         for (const p of out.payments ?? []) {
           try {
             await pay(taskId, {

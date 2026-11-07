@@ -68,7 +68,9 @@ export async function declineAsk(askId: string) {
   if (ask.status !== "pending") throw new Error(`ask is ${ask.status}`);
   asks.update(askId, { status: "declined", decided_at: now() });
   events.append(ask.task_id, "owner.declined", { ask: askId, usdc: fromMicro(BigInt(ask.micro)) });
-  await finishTask(ask.task_id, { status: "declined", answer: null });
+  const task = tasks.get(ask.task_id)!;
+  const draft = task.state ? (JSON.parse(task.state).draft as string | undefined) : undefined;
+  await finishTask(ask.task_id, { status: "declined", answer: draft ?? null });
 }
 
 function servicesDestination() {
