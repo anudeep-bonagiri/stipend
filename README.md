@@ -9,6 +9,22 @@ Built from an empty folder on November 7 and 8, 2026 for the MLH Solana Hackatho
 - Demo video: _link added at submission_
 - Live demo: _link added at submission_
 
+## The problem
+
+When an AI agent can pay for things, the money it can spend is not tied to the work it is doing.
+
+- The agent holds the key, or an API credit with no ceiling. Whatever it can reach, it can spend, all of it, on any task.
+- The budget is a number in the agent's own config or database. The same code that gets fooled by a web page is the code that is supposed to enforce the limit.
+- One bad input is enough. In the UK AI Security Institute's red-teaming challenge with Gray Swan, prompt injection succeeded over 60,000 times in 1.8 million attempts, and every one of 22 frontier models was breached at least once. The Freysa agent was talked out of its $47,000 prize on the 482nd message.
+- Approval is a tap the box relays, so a compromised box can approve itself.
+- Nothing public records which task spent what. If money leaves, nobody can prove afterward what the agent did or did not do.
+
+Meanwhile agents are paying for real: x402 passed 100 million agent payments on Base in three quarters (Chainalysis). So the failure mode is live: one fooled task can drain everything the agent has, and nobody can prove what happened.
+
+Stipend's answer: make each task's budget the physical limit of what it can spend, keep the owner's key off the box entirely, and put the record of each task on a chain the box cannot edit.
+
+Sources: [Gray Swan and UK AISI results](https://www.grayswan.ai/news/uk-aisi-x-gray-swan-agent-red-teaming-challenge-results-snapshot), [The Block on Freysa](https://www.theblock.co/post/328747/human-player-outwits-freysa-ai-agent-in-47000-crypto-challenge), [Chainalysis on x402](https://www.chainalysis.com/blog/x402-agentic-payments-adoption/).
+
 ## In 30 seconds
 
 AI agents now pay for things: searches, model calls, data, compute. Today that means an agent holds a key or an API credit, and one bad web page can spend all of it. Stipend gives each agent task a fresh Solana wallet funded with exactly its budget in USDC. The task pays per request, every payment names the task on chain, and the owner's own key never leaves the owner's browser. When the budget runs out the task stops and asks. When the task ends, the leftover comes back and a receipt is written to Solana that anyone can check without trusting the box.
